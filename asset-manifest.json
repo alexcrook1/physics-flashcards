@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/physics-flashcards/static/css/main.357a04c5.css",
+    "main.js": "/physics-flashcards/static/js/main.3598d33e.js",
+    "index.html": "/physics-flashcards/index.html",
+    "main.357a04c5.css.map": "/physics-flashcards/static/css/main.357a04c5.css.map",
+    "main.3598d33e.js.map": "/physics-flashcards/static/js/main.3598d33e.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.357a04c5.css",
+    "static/js/main.3598d33e.js"
+  ]
+}

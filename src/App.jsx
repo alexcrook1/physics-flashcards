@@ -360,6 +360,7 @@ function StudentInterface({ studentName, onLogout }) {
       const snapshot = await get(child(dbRef, `studentSettings/${studentName}`));
       if (snapshot.exists()) {
         setAvailableTopics(snapshot.val());
+        console.log("✓ Topics loaded from Firebase:", snapshot.val());
       } else {
         // Initialize all topics as disabled for new student
         const topics = {};
@@ -367,9 +368,11 @@ function StudentInterface({ studentName, onLogout }) {
           topics[topicId] = false;
         });
         setAvailableTopics(topics);
+        console.log("✓ New student - topics initialized (all disabled)");
       }
     } catch (error) {
-      console.log("Initial load - using demo mode");
+      console.error("❌ Firebase read failed:", error.message);
+      console.log("⚠️ FALLING BACK TO DEMO MODE - Firebase may not be working");
       // Demo mode - enable all topics
       const topics = {};
       Object.keys(FLASHCARD_DATA).forEach(topicId => {
@@ -637,8 +640,10 @@ function TeacherInterface({ onLogout }) {
       await update(ref(database, `studentSettings/${student}`), {
         [topicId]: newSettings[student][topicId]
       });
+      console.log("✓ Topic assignment saved to Firebase for", student);
     } catch (error) {
-      console.log("Settings updated locally");
+      console.error("❌ Firebase write failed for", student, ":", error.message);
+      console.log("⚠️ Assignment saved locally but NOT synced to Firebase");
     }
   };
 
@@ -646,6 +651,9 @@ function TeacherInterface({ onLogout }) {
     <div className="teacher-container">
       <div className="header">
         <h1>Teacher Dashboard 👨‍🏫</h1>
+        <div style={{ color: '#666', fontSize: '0.85em', margin: '5px 0' }}>
+          💾 Firebase connection: Check browser console (F12) for sync status
+        </div>
         <button className="logout-button" onClick={onLogout}>Logout</button>
       </div>
 

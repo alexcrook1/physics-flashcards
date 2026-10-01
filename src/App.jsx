@@ -441,19 +441,24 @@ function StudentInterface({ studentName, onLogout }) {
   const saveSessionData = async () => {
     try {
       const today = new Date().toDateString();
+      const studentId = STUDENT_MAPPING[studentName] || studentName;
+      
       const sessionData = {
         date: today,
         topicId: selectedTopic,
+        physicist: studentName,
         timeSpent: 600 - timeRemaining,
         cardsReviewed: Object.keys(cardProgress).length,
         cardsCorrect: Object.values(cardProgress).filter(v => v).length
       };
       
-      await update(ref(database, `studentProgress/${studentName}/sessions`), {
+      // Save under Student ID so teacher can access
+      await update(ref(database, `studentProgress/${studentId}/sessions`), {
         [today]: sessionData
       });
 
       localStorage.setItem('timeRemaining', timeRemaining);
+      console.log(`✓ Session saved for ${studentName} (${studentId}):`, sessionData);
     } catch (error) {
       console.log("Session data saved locally");
     }
@@ -635,20 +640,88 @@ function FlashcardView({ topic, cardIndex, isFlipped, onFlip, onCorrect, onIncor
 function TeacherInterface({ onLogout }) {
   const [students] = useState(['Student 1', 'Student 2']); // Replace with actual student list
   const [studentSettings, setStudentSettings] = useState({});
+  const [studentProgress, setStudentProgress] = useState({});
 
   useEffect(() => {
     initializeStudentSettings();
+    loadProgressAnalytics();
   }, []);
 
   const initializeStudentSettings = async () => {
     const settings = {};
-    students.forEach(student => {
-      settings[student] = {};
-      Object.keys(FLASHCARD_DATA).forEach(topicId => {
-        settings[student][topicId] = false;
+    
+    try {
+      // Load existing settings from Firebase for each student
+      for (const student of students) {
+        const dbRef = ref(database);
+        const snapshot = await get(child(dbRef, `studentSettings/${student}`));
+        
+        if (snapshot.exists()) {
+          settings[student] = snapshot.val();
+          console.log(`✓ Loaded assignments for ${student}:`, snapshot.val());
+        } else {
+          // Initialize empty if no settings yet
+          settings[student] = {};
+          Object.keys(FLASHCARD_DATA).forEach(topicId => {
+            settings[student][topicId] = false;
+          });
+          console.log(`✓ No assignments yet for ${student} - initialized empty`);
+        }
+      }
+    } catch (error) {
+      console.error("❌ Failed to load settings from Firebase:", error.message);
+      // Fallback: initialize all as empty
+      students.forEach(student => {
+        settings[student] = {};
+        Object.keys(FLASHCARD_DATA).forEach(topicId => {
+          settings[student][topicId] = false;
+        });
       });
-    });
+    }
+    
     setStudentSettings(settings);
+  };
+
+  const loadProgressAnalytics = async () => {
+    const progress = {};
+    
+    try {
+      for (const student of students) {
+        const dbRef = ref(database);
+        const snapshot = await get(child(dbRef, `studentProgress/${student}/sessions`));
+        
+        if (snapshot.exists()) {
+          const sessions = snapshot.val();
+          const analytics = {};
+          
+          // Aggregate by topic
+          Object.values(sessions).forEach(session => {
+            const topicId = session.topicId;
+            if (!analytics[topicId]) {
+              analytics[topicId] = {
+                timeSpent: 0,
+                cardsReviewed: 0,
+                cardsCorrect: 0,
+                sessionCount: 0
+              };
+            }
+            analytics[topicId].timeSpent += session.timeSpent || 0;
+            analytics[topicId].cardsReviewed += session.cardsReviewed || 0;
+            analytics[topicId].cardsCorrect += session.cardsCorrect || 0;
+            analytics[topicId].sessionCount += 1;
+          });
+          
+          progress[student] = analytics;
+          console.log(`✓ Loaded progress for ${student}:`, analytics);
+        } else {
+          progress[student] = {};
+        }
+      }
+    } catch (error) {
+      console.error("❌ Failed to load progress:", error.message);
+    }
+    
+    setStudentProgress(progress);
   };
 
   const toggleTopic = async (student, topicId) => {
@@ -710,6 +783,68 @@ function TeacherInterface({ onLogout }) {
                 </label>
               ))}
             </div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ marginTop: '30px', borderTop: '2px solid #ccc', paddingTop: '20px' }}>
+        <h2>📊 Student Progress Analytics</h2>
+        {students.map(student => (
+          <div key={`analytics-${student}`} style={{ 
+            marginBottom: '25px', 
+            backgroundColor: '#f9f9f9', 
+            padding: '15px', 
+            borderRadius: '8px',
+            border: '1px solid #ddd'
+          }}>
+            <h3>{student} - Progress by Topic</h3>
+            {Object.keys(studentProgress[student] || {}).length === 0 ? (
+              <p style={{ color: '#999', fontStyle: 'italic' }}>No progress data yet</p>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '15px' }}>
+                {Object.entries(studentProgress[student] || {}).map(([topicId, data]) => (
+                  <div key={`${student}-${topicId}`} style={{
+                    backgroundColor: '#fff',
+                    padding: '12px',
+                    borderRadius: '6px',
+                    border: '1px solid #e0e0e0'
+                  }}>
+                    <h4 style={{ margin: '0 0 10px 0', color: '#333' }}>
+                      {FLASHCARD_DATA[topicId]?.name || topicId}
+                    </h4>
+                    <div style={{ fontSize: '0.9em', color: '#555' }}>
+                      <p style={{ margin: '5px 0' }}>
+                        <strong>Sessions:</strong> {data.sessionCount}
+                      </p>
+                      <p style={{ margin: '5px 0' }}>
+                        <strong>Time spent:</strong> {Math.round(data.timeSpent / 60)} minutes
+                      </p>
+                      <p style={{ margin: '5px 0' }}>
+                        <strong>Cards done:</strong> {data.cardsCorrect} / {data.cardsReviewed} correct
+                      </p>
+                      <div style={{ 
+                        marginTop: '8px',
+                        backgroundColor: '#e8f5e9',
+                        height: '20px',
+                        borderRadius: '3px',
+                        overflow: 'hidden',
+                        border: '1px solid #81c784'
+                      }}>
+                        <div style={{
+                          width: `${data.cardsReviewed > 0 ? (data.cardsCorrect / data.cardsReviewed * 100) : 0}%`,
+                          height: '100%',
+                          backgroundColor: '#4caf50',
+                          transition: 'width 0.3s ease'
+                        }}></div>
+                      </div>
+                      <p style={{ margin: '5px 0 0 0', fontSize: '0.8em', color: '#999' }}>
+                        Accuracy: {data.cardsReviewed > 0 ? Math.round(data.cardsCorrect / data.cardsReviewed * 100) : 0}%
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ))}
       </div>

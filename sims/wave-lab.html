@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Waves and interference lab</title>
+<style>
+:root{--bg:#f7f6f2;--fg:#1e1e1b;--muted:#66655e;--line:#d8d5ca;--card:#ffffff;--accent:#0f6e56;--onaccent:#ffffff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1a1a18;--fg:#eeece4;--muted:#a3a198;--line:#3a3935;--card:#232320;--accent:#5dcaa5;--onaccent:#0b1f19}}
+:root[data-theme="dark"]{--bg:#1a1a18;--fg:#eeece4;--muted:#a3a198;--line:#3a3935;--card:#232320;--accent:#5dcaa5;--onaccent:#0b1f19}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.55}
+main{max-width:680px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:1.3rem;font-weight:600;margin:0 0 4px}
+.sub{color:var(--muted);font-size:.9rem;margin:0 0 14px}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin:0 0 12px;padding-bottom:2px}
+.tab{flex:0 0 auto;font:inherit;font-size:.92rem;min-height:44px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--onaccent)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px}
+canvas{display:block;border-radius:6px;max-width:100%}
+.cap{color:var(--muted);font-size:.82rem;margin:6px 0 0}
+.ctl{margin:12px 0 0}
+.row{display:flex;justify-content:space-between;align-items:baseline;font-size:.95rem}
+.row b{font-weight:600;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;margin:4px 0 0;accent-color:var(--accent);height:32px}
+input:disabled{opacity:.4}
+.tog{display:flex;align-items:center;gap:8px;font-size:.95rem;min-height:36px;margin-top:6px}
+.tog input{width:18px;height:18px;accent-color:var(--accent)}
+button.b{font:inherit;font-size:.92rem;min-height:44px;padding:0 14px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--fg);cursor:pointer}
+button.b.on{background:var(--accent);border-color:var(--accent);color:var(--onaccent)}
+button:focus-visible,.tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.read{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;font-size:.92rem;margin-top:10px}
+.read div span{color:var(--muted);display:block;font-size:.78rem}
+.read div b{font-variant-numeric:tabular-nums}
+.res{margin-top:10px;font-weight:600;color:var(--accent)}
+.info{margin-top:10px;font-size:.92rem}
+.key{border-left:3px solid var(--accent);padding:2px 0 2px 10px;margin:0 0 12px;font-size:.95rem}
+.meter{height:14px;border-radius:7px;background:var(--line);overflow:hidden;margin-top:6px}
+.meter>div{height:100%;width:0;background:var(--accent)}
+.sci h2{font-size:1.05rem;margin:0 0 6px}
+.sci h3{font-size:.95rem;margin:14px 0 4px}
+.sci p{margin:0 0 8px;font-size:.95rem}
+.sci ul{margin:0 0 8px;padding-left:20px;font-size:.95rem}
+.sci li{margin-bottom:3px}
+.eqn{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 8px;display:inline-block;margin:2px 0;font-size:.9rem}
+.flex{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+
+.tabs{overflow:visible;flex-wrap:wrap}
+.tab{min-height:40px;padding:0 12px;font-size:.88rem}
+svg.dv{display:block;width:100%;height:auto}
+.dvt{font-size:14px;fill:var(--fg)}
+.dvm{font-size:12px;fill:var(--muted)}
+.dvb{fill:none;stroke:var(--muted);stroke-width:3}
+.dvax{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3;fill:none}
+.dvf{opacity:0;transition:opacity .7s ease}
+.dvf.on{opacity:1}
+.dvd{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1s ease}
+.dvd.on{stroke-dashoffset:0}
+.stepno{color:var(--muted);font-size:.8rem;margin:0 0 4px}
+.dcap{font-size:1rem;margin:0 0 10px;min-height:4.6em}
+.eqs{margin-top:10px;border-top:1px solid var(--line);padding-top:8px;min-height:40px}
+.eq{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.95rem;padding:2px 0;color:var(--muted)}
+.eq.new{color:var(--accent);font-weight:600}
+.dots{display:flex;gap:6px;margin-top:12px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.dot.on{background:var(--accent)}
+button:disabled{opacity:.4;cursor:default}
+@media (prefers-reduced-motion:reduce){.dvf,.dvd{transition:none}}
+html.embed h1,html.embed .sub{display:none}
+html.embed main{padding-top:10px}
+</style>
+</head>
+<body>
+<main>
+<h1>Waves and interference lab</h1>
+<p class="sub">Eight interactive experiments with the science behind each, for A-level physics.</p>
+
+<div class="tabs" role="tablist" aria-label="Experiments">
+<button class="tab" role="tab" id="tab-t1" data-tab="t1" aria-selected="true">Path difference</button>
+<button class="tab" role="tab" id="tab-td" data-tab="td" aria-selected="false">Double slit</button>
+<button class="tab" role="tab" id="tab-tv" data-tab="tv" aria-selected="false">Derivation</button>
+<button class="tab" role="tab" id="tab-t2" data-tab="t2" aria-selected="false">Slits and gratings</button>
+<button class="tab" role="tab" id="tab-t3" data-tab="t3" aria-selected="false">Microwaves</button>
+<button class="tab" role="tab" id="tab-tp" data-tab="tp" aria-selected="false">Progressive waves</button>
+<button class="tab" role="tab" id="tab-ts" data-tab="ts" aria-selected="false">Standing waves</button>
+<button class="tab" role="tab" id="tab-tl" data-tab="tl" aria-selected="false">Polarisation</button>
+</div>
+
+<!-- ============ TAB 1 ============ -->
+<section id="t1" role="tabpanel" aria-labelledby="tab-t1">
+<p class="key">Path difference Δ = r₂ − r₁. Sources in phase: constructive when Δ = nλ, destructive when Δ = (n + ½)λ.</p>
+<div class="panel">
+<canvas id="rip" style="touch-action:none;cursor:crosshair"></canvas>
+<p class="cap">Two coherent sources, S₁ and S₂, in phase. Teal is a crest, coral a trough. Touch or drag anywhere to move point P.</p>
+<div class="flex" style="margin-top:10px">
+<div style="flex:1 1 200px">
+<div class="read">
+<div><span>Distance from S₁</span><b id="r1o">–</b></div>
+<div><span>Distance from S₂</span><b id="r2o">–</b></div>
+<div><span>Path difference</span><b id="pdo">–</b></div>
+<div><span>Phase difference</span><b id="pho">–</b></div>
+</div>
+<div class="res" id="reso"></div>
+</div>
+<div style="flex:0 0 150px">
+<canvas id="pha" width="150" height="150" style="width:150px;height:150px"></canvas>
+<p class="cap" style="text-align:center" id="phaCap"></p>
+</div>
+</div>
+</div>
+<div class="panel">
+<div class="ctl" style="margin-top:0"><div class="row"><label for="r_lam">Wavelength, λ</label><b id="r_lamo">24 px</b></div><input id="r_lam" type="range" min="12" max="40" step="1" value="24"></div>
+<div class="ctl"><div class="row"><label for="r_d">Source separation, d</label><b id="r_do">80 px</b></div><input id="r_d" type="range" min="30" max="160" step="2" value="80"></div>
+<div class="btns"><button class="b" id="r_play">Pause</button></div>
+</div>
+<div class="panel sci">
+<h2>The science</h2>
+<h3>Superposition and coherence</h3>
+<p>When two waves meet, the resultant displacement is the sum of the individual displacements (the principle of superposition). Where crests meet crests the waves reinforce, and where crests meet troughs they cancel. That is interference.</p>
+<p>A steady, visible pattern needs coherent sources. Coherent means the same frequency (so the same wavelength) and a constant phase difference. The phase difference does not have to be zero, it just has to stay fixed. The amplitudes do not need to match, but if they differ the minima will not be perfectly dark.</p>
+<h3>Path difference and phase difference</h3>
+<p>If the sources emit in phase, the phase difference at a point depends only on how much further one wave has travelled:</p>
+<p><span class="eqn">phase difference = 2πΔ / λ</span> &nbsp; (or 360° × Δ / λ)</p>
+<ul>
+<li>Δ = nλ (n = 0, 1, 2 …): waves arrive in phase, so constructive interference and a maximum.</li>
+<li>Δ = (n + ½)λ: waves arrive in antiphase, so destructive interference and a minimum.</li>
+<li>Anywhere else the result is somewhere in between.</li>
+</ul>
+<p>In the simulation the dark lines running out from the sources are lines of destructive interference. Move P along one and the path difference stays at the same half-integer number of wavelengths. Increase d and more lines appear, because the largest possible path difference is d itself, so the number of maxima on each side is limited by d / λ.</p>
+<h3>Phasors</h3>
+<p>The small diagram shows each wave as an arrow. Its length is the amplitude and its angle is the phase at P. Adding the arrows tip to tail gives the resultant. For two equal waves with phase difference φ the resultant amplitude is 2A|cos(φ/2)|, and since intensity is proportional to amplitude squared, the intensity swings between 0 and 4I₀. The average is 2I₀, so energy is redistributed rather than created or destroyed.</p>
+<h3>Link to Young's double slit</h3>
+<p>The two slits act as the two coherent sources. On a distant screen the two paths are almost parallel, so Δ = d sin θ, and for small angles that becomes Δ ≈ dx / D. Setting Δ = nλ gives the fringe spacing <span class="eqn">w = λD / d</span>.</p>
+<h3>Common exam slips</h3>
+<ul>
+<li>Coherent does not mean "in phase". It means a constant phase difference.</li>
+<li>Always say "path difference of a whole number of wavelengths" for maxima, and "an odd number of half wavelengths" for minima.</li>
+<li>Interference redistributes energy, it does not destroy it.</li>
+</ul>
+</div>
+</section>
+
+<!-- ============ TAB 2 ============ -->
+<section id="t2" role="tabpanel" aria-labelledby="tab-t2" hidden>
+<p class="key" id="g_key">Single slit: first minimum at a sin θ = λ.</p>
+<div class="panel">
+<div class="btns" style="margin-top:0">
+<button class="b on" id="mSingle" aria-pressed="true">Single slit</button>
+<button class="b" id="mGrat" aria-pressed="false">Diffraction grating</button>
+</div>
+<canvas id="gStrip" style="margin-top:12px"></canvas>
+<canvas id="gPlot" style="margin-top:8px"></canvas>
+<p class="cap" id="gCap"></p>
+<div class="info" id="gInfo"></div>
+</div>
+<div class="panel">
+<div class="ctl" style="margin-top:0"><div class="row"><label for="s2lam">Wavelength, λ</label><b id="s2lamo">600 nm</b></div><input id="s2lam" type="range" min="400" max="700" step="5" value="600"></div>
+<div id="grpSingle">
+<div class="ctl"><div class="row"><label for="s2a">Slit width, a</label><b id="s2ao">50 µm</b></div><input id="s2a" type="range" min="10" max="100" step="1" value="50"></div>
+</div>
+<div id="grpGrat" hidden>
+<div class="ctl"><div class="row"><label for="s2lines">Lines per mm</label><b id="s2lineso">300</b></div><input id="s2lines" type="range" min="100" max="600" step="10" value="300"></div>
+<div class="ctl"><div class="row"><label for="s2N">Number of slits lit, N</label><b id="s2No">20</b></div><input id="s2N" type="range" min="2" max="40" step="1" value="20"></div>
+<label class="tog"><input type="checkbox" id="s2white"> White light (all wavelengths together)</label>
+</div>
+</div>
+<div class="panel sci">
+<h2>The science</h2>
+<h3>Diffraction</h3>
+<p>Diffraction is the spreading of a wave as it passes through a gap or around an edge. It is most noticeable when the gap is about the same size as the wavelength. A gap much wider than λ barely spreads the wave at all, which is why you do not see light bending round doorways but you do hear sound do it.</p>
+<p>Huygens' model explains it. Every point on a wavefront acts as a source of secondary wavelets, all in phase. A slit lets through only a short row of these sources, and the sideways spread is no longer cancelled by neighbours.</p>
+<h3>Single slit</h3>
+<p>Treat the slit as many tiny sources. In the direction where the path difference between the top edge and the bottom edge is exactly λ, every source in the top half has a partner in the bottom half that is half a wavelength out of step, so everything cancels. That gives the first minimum:</p>
+<p><span class="eqn">a sin θ = λ</span> &nbsp; and more generally <span class="eqn">a sin θ = nλ</span> for n = 1, 2, 3 …</p>
+<ul>
+<li>The central maximum is about twice as wide as the others and much brighter. On a screen distance D away its full width is roughly 2λD / a.</li>
+<li>A narrower slit gives a wider pattern. A longer wavelength also gives a wider pattern.</li>
+<li>Note there is no n = 0 minimum, because θ = 0 is the centre of the bright maximum.</li>
+</ul>
+<h3>Diffraction grating</h3>
+<p>A grating has a huge number of equally spaced slits. If the path difference between light from neighbouring slits is a whole number of wavelengths, every slit's light arrives in phase and you get a bright maximum:</p>
+<p><span class="eqn">d sin θ = nλ</span> &nbsp; where d = 1 / (lines per metre)</p>
+<ul>
+<li>n = 0 is straight ahead, n = ±1 are the first orders, and so on.</li>
+<li>Since sin θ cannot exceed 1, the highest order is the largest whole number below d / λ.</li>
+<li>More slits lit means sharper, brighter maxima. With N slits there are N − 1 minima between neighbouring maxima, and the peak width shrinks roughly as 1 / N. Try the N slider.</li>
+<li>Compared with a double slit the maxima are far narrower, so wavelengths can be measured much more precisely.</li>
+</ul>
+<p>In the simulation the slits are a fixed 1 µm wide, so the single-slit envelope is very broad and fades the higher orders slowly.</p>
+<h3>White light</h3>
+<p>Each wavelength has its own θ for a given order, so white light is split. The zeroth order stays white because every wavelength has zero path difference there. In each higher order the spectrum runs from violet (shorter λ, smaller angle) to red (longer λ, larger angle). Higher orders are wider and eventually overlap, for example red in the second order overlaps violet in the third.</p>
+<h3>Worked example</h3>
+<p>A grating has 600 lines per mm and is lit with 590 nm light. Then d = 1/600 000 m = 1.67 µm. First order: sin θ = 590 nm / 1667 nm = 0.354, so θ = 20.7°. The highest order is below d / λ = 2.8, so n = 2 is the highest.</p>
+</div>
+</section>
+
+<!-- ============ TAB 3 ============ -->
+<section id="t3" role="tabpanel" aria-labelledby="tab-t3" hidden>
+<p class="key">Adjacent nodes (or antinodes) are λ / 2 apart, so λ = 2 × node spacing.</p>
+<div class="panel">
+<canvas id="mw"></canvas>
+<p class="cap" id="mwCap">Microwaves from the emitter (right) reflect off the metal plate (left). The incident and reflected waves superpose to give a standing wave.</p>
+<div class="row" style="margin-top:10px"><span>Receiver signal</span><b id="msig">–</b></div>
+<div class="meter"><div id="mbar"></div></div>
+<canvas id="mwg" style="margin-top:12px"></canvas>
+<div class="info" id="mwInfo"></div>
+</div>
+<div class="panel">
+<div class="ctl" style="margin-top:0"><div class="row"><label for="mU">Probe distance from plate</label><b id="mUo">6.0 cm</b></div><input id="mU" type="range" min="0" max="30" step="0.1" value="6"></div>
+<div id="mLamGrp"><div class="ctl"><div class="row"><label for="mLam">Wavelength, λ</label><b id="mLamo">2.8 cm</b></div><input id="mLam" type="range" min="2" max="4" step="0.1" value="2.8"></div></div>
+<label class="tog" id="mBothW"><input type="checkbox" id="mBoth"> Show incident and reflected waves</label>
+<label class="tog"><input type="checkbox" id="mPractice"> Practice mode (hide the wave, find λ from the meter)</label>
+<div class="btns" id="mPracBtns" hidden>
+<button class="b" id="mRec">Record reading</button>
+<button class="b" id="mClear">Clear</button>
+<button class="b" id="mReveal">Reveal</button>
+<button class="b" id="mNew">New wavelength</button>
+</div>
+<div class="btns"><button class="b" id="mPlay">Pause</button></div>
+</div>
+<div class="panel sci">
+<h2>The science</h2>
+<h3>Microwaves</h3>
+<p>Microwaves are electromagnetic waves. School microwave sets typically emit at around 10 GHz, giving a wavelength of about 3 cm, which is long enough to measure with a ruler. Use c = fλ, so λ = 3.00 × 10⁸ / f.</p>
+<h3>Why a standing wave forms</h3>
+<p>The wave hits the metal plate and reflects back along the same line. The incident and reflected waves have the same frequency and amplitude and travel in opposite directions. Because they come from one source they are coherent, so they superpose to give a stationary (standing) wave.</p>
+<p>The electric field must be zero at a metal surface, so there is a node at the plate. Reflection there introduces a phase change of π (half a cycle).</p>
+<h3>Nodes and antinodes</h3>
+<ul>
+<li>Nodes are points of permanently zero amplitude. Antinodes are points of maximum amplitude.</li>
+<li>At distance u from the plate the amplitude is proportional to |sin(2πu / λ)|, so nodes are at u = nλ / 2 and antinodes are at odd multiples of λ / 4.</li>
+<li>Adjacent nodes are λ / 2 apart. Adjacent antinodes are also λ / 2 apart, and a node sits exactly midway between two antinodes.</li>
+</ul>
+<h3>Standing wave compared with a progressive wave</h3>
+<ul>
+<li>No energy is transferred along a standing wave, because the two waves carry equal energy in opposite directions.</li>
+<li>Amplitude varies with position, from zero at nodes to a maximum at antinodes. In a progressive wave every point reaches the same amplitude.</li>
+<li>All points between two adjacent nodes oscillate in phase, and points in neighbouring loops are in antiphase. In a progressive wave the phase changes steadily along the wave.</li>
+</ul>
+<h3>The experiment</h3>
+<p>Move the receiver along the line between the plate and the emitter and watch the meter. It rises and falls, with minima at the nodes. Measure the distance across as many nodes as you can, divide by the number of gaps to get the node spacing, and then:</p>
+<p><span class="eqn">λ = 2 × node spacing</span> &nbsp; and then &nbsp; <span class="eqn">f = c / λ</span></p>
+<p>Measuring across, say, ten gaps rather than one reduces the percentage uncertainty in the spacing, because the same ruler uncertainty is spread over a much bigger distance.</p>
+<h3>As interference</h3>
+<p>At the probe the direct wave and the reflected wave differ in path by 2u. Adding the half-cycle phase change on reflection, destructive interference (a node) happens when 2u = nλ, and constructive interference (an antinode) when 2u = (n + ½)λ. That matches nodes at nλ / 2.</p>
+</div>
+</section>
+<!-- ============ DOUBLE SLIT ============ -->
+<section id="td" role="tabpanel" aria-labelledby="tab-td" hidden>
+<p class="key">Young's double slit: fringe spacing w = λD / d.</p>
+<div class="panel">
+<div class="row"><span>Fringe spacing</span><b id="dsW" style="font-size:1.5rem">–</b></div>
+<canvas id="dsStrip" style="margin-top:10px"></canvas>
+<canvas id="dsPlot" style="margin-top:8px"></canvas>
+<p class="cap">Screen view, 24 mm wide, with relative intensity below. The centre of the pattern is at 0 mm.</p>
+</div>
+<div class="panel">
+<div class="ctl" style="margin-top:0"><div class="row"><label for="dsLam">Wavelength, λ</label><b id="dsLamo">600 nm</b></div><input id="dsLam" type="range" min="400" max="700" step="5" value="600"></div>
+<div class="ctl"><div class="row"><label for="dsd">Slit separation, d</label><b id="dsdo">0.50 mm</b></div><input id="dsd" type="range" min="0.2" max="1" step="0.05" value="0.5"></div>
+<div class="ctl"><div class="row"><label for="dsD">Screen distance, D</label><b id="dsDo">1.5 m</b></div><input id="dsD" type="range" min="0.5" max="3" step="0.1" value="1.5"></div>
+<label class="tog"><input type="checkbox" id="dsWhite"> White light (all wavelengths together)</label>
+<p class="cap">w is worked out from the other three, so it is the result rather than a slider. Try doubling d and see what happens to w.</p>
+</div>
+<div class="panel sci">
+<h2>The science</h2>
+<h3>The set-up</h3>
+<p>Light from a single source (or a laser) reaches two narrow, closely spaced slits. Each slit diffracts the light so that it spreads out, and the two spreading beams overlap on the screen. Because both slits are lit by the same wavefront, the light leaving them is coherent: same wavelength and a constant phase difference.</p>
+<h3>Why there are fringes</h3>
+<p>At a point on the screen the two waves have travelled different distances. Where the path difference is a whole number of wavelengths they arrive in phase and add to give a bright fringe. Where it is an odd number of half wavelengths they arrive in antiphase and cancel to give a dark fringe. The derivation tab shows how this gives:</p>
+<p><span class="eqn">w = λD / d</span> &nbsp; or &nbsp; <span class="eqn">λ = wd / D</span></p>
+<p>This needs D much larger than d, so that the two paths are nearly parallel and the angle is small.</p>
+<h3>What changes the pattern</h3>
+<ul>
+<li>Longer wavelength: wider fringes (red fringes are wider than blue).</li>
+<li>Larger slit separation d: narrower fringes, and the pattern is more crowded.</li>
+<li>Larger screen distance D: wider fringes, because the same angle gives a bigger distance.</li>
+</ul>
+<h3>White light</h3>
+<p>Each wavelength makes its own set of fringes with its own spacing. At the centre the path difference is zero for every colour, so the central fringe is white. Either side the colours drift apart, with blue nearest the centre and red furthest out, and further out the overlapping colours blur towards white.</p>
+<h3>Measuring w accurately</h3>
+<ul>
+<li>Measure across many fringes and divide, which reduces the percentage uncertainty in w.</li>
+<li>Count carefully. Measuring centre to centre across n fringe spacings needs n gaps. Check whether a diagram's measuring arrow runs centre to centre or edge to edge before you divide.</li>
+<li>Use a metre rule for D, and a travelling microscope or a ruler on the screen for w. Slit separation d is usually given.</li>
+<li>Laser safety: never look into the beam, avoid reflective objects near it, and use a low-power laser (below 1 mW).</li>
+</ul>
+</div>
+</section>
+
+<!-- ============ DERIVATION ============ -->
+<section id="tv" role="tabpanel" aria-labelledby="tab-tv" hidden>
+<p class="key">Step through the derivation of λ = wd / D. Not to scale: d and θ are exaggerated.</p>
+<div class="panel">
+<svg class="dv" viewBox="0 0 380 270" role="img" aria-label="Double-slit geometry built up step by step">
+<g class="dvf" data-s="1">
+<line class="dvb" x1="60" y1="70" x2="60" y2="134"/>
+<line class="dvb" x1="60" y1="146" x2="60" y2="194"/>
+<line class="dvb" x1="60" y1="206" x2="60" y2="260"/>
+<line class="dvb" x1="320" y1="70" x2="320" y2="260"/>
+<text class="dvt" x="60" y="52" text-anchor="middle">Slits</text>
+<text class="dvt" x="320" y="52" text-anchor="middle">Screen</text>
+<text class="dvt" x="40" y="140" text-anchor="middle">S₁</text>
+<text class="dvt" x="40" y="200" text-anchor="middle">S₂</text>
+<text class="dvt" x="44" y="172" text-anchor="middle">d</text>
+<line class="dvax" x1="60" y1="170" x2="320" y2="170"/>
+<text class="dvt" x="190" y="192" text-anchor="middle">D</text>
+</g>
+<line class="dvd" data-s="2" pathLength="1" x1="60" y1="140" x2="320" y2="100" stroke="#1D9E75" stroke-width="1.5"/>
+<line class="dvd" data-s="2" pathLength="1" x1="60" y1="200" x2="320" y2="100" stroke="#D85A30" stroke-width="1.5"/>
+<g class="dvf" data-s="2">
+<circle cx="320" cy="100" r="4" fill="#534AB7"/>
+<text class="dvt" x="334" y="96">P</text>
+</g>
+<g class="dvf" data-s="3">
+<line x1="60" y1="200" x2="80" y2="192.3" stroke="#D85A30" stroke-width="4"/>
+<line class="dvax" x1="60" y1="140" x2="80" y2="192.3"/>
+<line class="dvax" x1="72" y1="196" x2="104" y2="230"/>
+<text class="dvm" x="100" y="246">path difference</text>
+</g>
+<g class="dvf" data-s="4">
+<line class="dvax" x1="60" y1="170" x2="320" y2="100"/>
+<path d="M110 170 A50 50 0 0 0 108.3 157" fill="none" stroke="var(--muted)" stroke-width="1"/>
+<text class="dvt" x="122" y="162" text-anchor="middle">θ</text>
+</g>
+<g class="dvf" data-s="5">
+<line x1="320" y1="170" x2="320" y2="100" stroke="#534AB7" stroke-width="4"/>
+<text class="dvt" x="334" y="140">x</text>
+</g>
+</svg>
+<div class="eqs" id="vEqs" aria-live="polite"></div>
+</div>
+<div class="panel">
+<p class="stepno" id="vStepno"></p>
+<p class="dcap" id="vCap" aria-live="polite"></p>
+<div class="btns"><button class="b" id="vBack">Back</button><button class="b on" id="vNext">Next</button><button class="b" id="vPlay">Play</button></div>
+<div class="dots" id="vDots" aria-hidden="true"></div>
+</div>
+<div class="panel sci">
+<h2>Notes on the derivation</h2>
+<ul>
+<li>Two assumptions carry the whole result: D is much bigger than d (so the rays are nearly parallel), and θ is small (so sin θ ≈ tan θ).</li>
+<li>Here x is measured from the centre of the pattern to the nth bright fringe. The fringe spacing w is the distance between neighbouring bright fringes, which is why the n cancels.</li>
+<li>For dark fringes the condition changes to path difference = (n + ½)λ, but the spacing between neighbouring dark fringes is the same w.</li>
+<li>The equation only holds for monochromatic light. With white light each colour has its own w.</li>
+<li>In the exam, state the two approximations if you are asked to derive or justify the equation.</li>
+</ul>
+</div>
+</section>
+
+<!-- ============ PROGRESSIVE WAVES ============ -->
+<section id="tp" role="tabpanel" aria-labelledby="tab-tp" hidden>
+<p class="key">Wave speed v = fλ, and period T = 1 / f.</p>
+<div class="panel">
+<div class="btns" style="margin-top:0">
+<button class="b on" id="pwT" aria-pressed="true">Transverse</button>
+<button class="b" id="pwL" aria-pressed="false">Longitudinal</button>
+<button class="b" id="pwPlay">Pause</button>
+</div>
+<canvas id="pwWave" style="margin-top:10px"></canvas>
+<p class="cap" id="pwCap"></p>
+<canvas id="pwTime" style="margin-top:8px"></canvas>
+<p class="cap">Displacement against time at points P and Q, for the last 3 seconds.</p>
+<div class="info" id="pwInfo"></div>
+</div>
+<div class="panel">
+<div class="ctl" style="margin-top:0"><div class="row"><label for="pwA">Amplitude, A</label><b id="pwAo">0.30 m</b></div><input id="pwA" type="range" min="0.1" max="0.5" step="0.05" value="0.3"></div>
+<div class="ctl"><div class="row"><label for="pwLam">Wavelength, λ</label><b id="pwLamo">1.00 m</b></div><input id="pwLam" type="range" min="0.4" max="2" step="0.05" value="1"></div>
+<div class="ctl"><div class="row"><label for="pwF">Frequency, f</label><b id="pwFo">1.0 Hz</b></div><input id="pwF" type="range" min="0.5" max="3" step="0.1" value="1"></div>
+<div class="ctl"><div class="row"><label for="pwSep">Distance from P to Q</label><b id="pwSepo">0.25 m</b></div><input id="pwSep" type="range" min="0" max="2" step="0.05" value="0.25"></div>
+</div>
+<div class="panel sci">
+<h2>The science</h2>
+<h3>What a progressive wave does</h3>
+<p>A progressive wave transfers energy from place to place without transferring matter. Each particle of the medium (or each point in the field) oscillates about a fixed position, and passes the disturbance on to its neighbour a moment later.</p>
+<h3>Transverse and longitudinal</h3>
+<ul>
+<li>Transverse: the oscillations are at right angles to the direction the wave travels. Examples are light and all electromagnetic waves, waves on a rope and ripples on water.</li>
+<li>Longitudinal: the oscillations are parallel to the direction of travel. Sound is the standard example. It forms compressions (particles close together) and rarefactions (particles spread out).</li>
+</ul>
+<h3>Quantities</h3>
+<ul>
+<li>Displacement: distance of a point from its equilibrium position, in a stated direction.</li>
+<li>Amplitude A: the maximum displacement.</li>
+<li>Wavelength λ: the distance between two adjacent points in phase, for example crest to crest, or compression to compression.</li>
+<li>Period T: the time for one complete oscillation of a point. Frequency f = 1 / T.</li>
+<li>Wave speed: v = fλ.</li>
+</ul>
+<p>The wave in the simulation is y = A sin(kx − ωt), where k = 2π / λ and ω = 2πf.</p>
+<h3>Two graphs, two measurements</h3>
+<p>A displacement-distance graph is a snapshot of the whole wave, so you read the wavelength from it. A displacement-time graph follows one point, so you read the period from it. Exam questions often test whether you can tell which graph you have been given.</p>
+<h3>Phase and phase difference</h3>
+<p>Phase describes where a point is in its oscillation cycle. Points a whole number of wavelengths apart are in phase. Points an odd number of half wavelengths apart are in antiphase. In general:</p>
+<p><span class="eqn">phase difference = 2π Δx / λ</span> &nbsp; (or 360° × Δx / λ)</p>
+<p>Move P and Q apart with the slider and watch the two traces on the time graph slide relative to each other.</p>
+<h3>Intensity</h3>
+<p>The intensity of a wave is proportional to the square of its amplitude, so doubling the amplitude quadruples the intensity.</p>
+</div>
+</section>
+
+<!-- ============ STANDING WAVES ============ -->
+<section id="ts" role="tabpanel" aria-labelledby="tab-ts" hidden>
+<p class="key">Adjacent nodes are λ / 2 apart. String or open pipe: f = nv / 2L. Pipe closed at one end: f = nv / 4L, n odd.</p>
+<div class="panel">
+<div class="btns" style="margin-top:0">
+<button class="b on" id="stString" aria-pressed="true">String</button>
+<button class="b" id="stOpen" aria-pressed="false">Open pipe</button>
+<button class="b" id="stClosed" aria-pressed="false">Closed pipe</button>
+<button class="b" id="stPlay">Pause</button>
+</div>
+<canvas id="stCan" style="margin-top:10px"></canvas>
+<p class="cap" id="stCap"></p>
+<div class="info" id="stInfo"></div>
+</div>
+<div class="panel">
+<div class="ctl" style="margin-top:0"><div class="row"><label for="stI">Mode</label><b id="stIo">2nd harmonic</b></div><input id="stI" type="range" min="1" max="6" step="1" value="2"></div>
+<div class="ctl"><div class="row"><label for="stL">Length, L</label><b id="stLo">1.00 m</b></div><input id="stL" type="range" min="0.5" max="2" step="0.05" value="1"></div>
+<div class="ctl"><div class="row"><label for="stV">Wave speed, v</label><b id="stVo">200 m/s</b></div><input id="stV" type="range" min="100" max="400" step="10" value="200"></div>
+<label class="tog"><input type="checkbox" id="stEnv" checked> Show the envelope</label>
+</div>
+<div class="panel sci">
+<h2>The science</h2>
+<h3>How a standing wave forms</h3>
+<p>A wave travelling along a string (or air column) reflects at the end and comes back. The incident and reflected waves have the same frequency and amplitude, and they travel in opposite directions, so they superpose. At certain frequencies the result is a pattern that does not travel along the string: a stationary (standing) wave.</p>
+<h3>Nodes and antinodes</h3>
+<ul>
+<li>Nodes are points of zero amplitude. The two waves are always in antiphase there.</li>
+<li>Antinodes are points of maximum amplitude. The two waves are always in phase there.</li>
+<li>Adjacent nodes are λ / 2 apart, adjacent antinodes are λ / 2 apart, and a node is midway between two antinodes.</li>
+</ul>
+<h3>Harmonics</h3>
+<p>Only certain wavelengths fit, because the ends must be nodes or antinodes. The lowest frequency is the first harmonic (the fundamental).</p>
+<ul>
+<li>String fixed at both ends: a node at each end, so L = nλ / 2 and f = nv / 2L for n = 1, 2, 3 …</li>
+<li>Open pipe: an antinode at each end, so L = nλ / 2 and f = nv / 2L, the same series.</li>
+<li>Pipe closed at one end: a node at the closed end and an antinode at the open end, so L = nλ / 4 and f = nv / 4L for odd n only (1, 3, 5 …).</li>
+</ul>
+<p>For a stretched string the wave speed is v = √(T / μ), where T is the tension and μ is the mass per unit length. The first harmonic is therefore f = (1 / 2L)√(T / μ). Shortening the string, tightening it, or using a lighter string all raise the pitch.</p>
+<h3>Standing wave compared with progressive wave</h3>
+<ul>
+<li>A standing wave transfers no net energy along it, because the two waves carry equal energy in opposite directions. A progressive wave transfers energy.</li>
+<li>Amplitude in a standing wave varies from zero at nodes to a maximum at antinodes. In a progressive wave every point has the same amplitude.</li>
+<li>All points between two adjacent nodes oscillate in phase, and points in neighbouring loops are in antiphase. In a progressive wave the phase changes steadily along the wave.</li>
+<li>Wavelength in a standing wave is twice the distance between adjacent nodes.</li>
+</ul>
+<h3>Notes on the simulation</h3>
+<p>The oscillation is slowed down so you can see it. For the pipes, the curve shows the displacement of the air, with a displacement node at a closed end and a displacement antinode at an open end.</p>
+</div>
+</section>
+
+<!-- ============ POLARISATION ============ -->
+<section id="tl" role="tabpanel" aria-labelledby="tab-tl" hidden>
+<p class="key">Malus's law: I = I₀ cos²θ. Unpolarised light loses half its intensity at the first polariser.</p>
+<div class="panel">
+<canvas id="plCan"></canvas>
+<p class="cap">Each circle is a view looking down the beam. The line shows the direction the electric field oscillates in.</p>
+<div class="info" id="plInfo"></div>
+<canvas id="plGraph" style="margin-top:10px"></canvas>
+<p class="cap">Intensity after the last polariser against its angle.</p>
+</div>
+<div class="panel">
+<div class="ctl" style="margin-top:0"><div class="row"><label for="plTh">Analyser angle, θ</label><b id="plTho">45°</b></div><input id="plTh" type="range" min="0" max="180" step="1" value="45"></div>
+<label class="tog"><input type="checkbox" id="plMid"> Add a middle polariser</label>
+<div id="plPhiGrp" hidden><div class="ctl"><div class="row"><label for="plPhi">Middle polariser angle, φ</label><b id="plPhio">45°</b></div><input id="plPhi" type="range" min="0" max="90" step="1" value="45"></div></div>
+<div class="btns"><button class="b" id="plPlay">Pause</button></div>
+</div>
+<div class="panel sci">
+<h2>The science</h2>
+<h3>Plane polarised light</h3>
+<p>Light is a transverse wave, and its electric field oscillates at right angles to the direction of travel. In unpolarised light the oscillation direction changes randomly and takes every direction in the plane. In plane polarised light the oscillations are in one direction only.</p>
+<p>Only transverse waves can be polarised. Sound and other longitudinal waves cannot, so being able to polarise light is evidence that light is transverse.</p>
+<h3>Polarisers and Malus's law</h3>
+<p>A polarising filter only transmits the component of the electric field along its transmission axis. Unpolarised light passing through one polariser emerges plane polarised with half the intensity. If polarised light then meets a second polariser (the analyser) at angle θ to the first, the amplitude transmitted is A cos θ. Intensity is proportional to amplitude squared, so:</p>
+<p><span class="eqn">I = I₀ cos²θ</span></p>
+<ul>
+<li>θ = 0°: all the light passes.</li>
+<li>θ = 90° (crossed polarisers): no light passes.</li>
+<li>Rotating the analyser through 360° gives two maxima and two minima.</li>
+</ul>
+<h3>The middle polariser</h3>
+<p>Tick the box and put a middle polariser at 45° between two crossed polarisers. Light now gets through, even though it could not before. The middle polariser rotates the polarisation direction, so each stage has a component along the next axis. With the middle one at 45° the final intensity is I₀ / 2 × cos²45° × cos²45° = I₀ / 8.</p>
+<h3>Other ways to polarise light</h3>
+<ul>
+<li>Reflection: light reflected from a non-metallic surface such as water or glass is partly polarised, and completely polarised at the Brewster angle, where tan θ = n.</li>
+<li>Scattering in the atmosphere partly polarises skylight.</li>
+</ul>
+<h3>Uses</h3>
+<ul>
+<li>Polarising sunglasses reduce glare, because reflected glare is largely horizontally polarised and the lenses block it.</li>
+<li>LCD screens use polarisers and liquid crystals that rotate the polarisation direction to switch pixels on and off.</li>
+<li>Stress analysis: some transparent plastics rotate polarised light differently where they are strained, which shows up as coloured patterns.</li>
+<li>Aligning TV and radio aerials with the transmitted signal, since broadcast radio waves are polarised.</li>
+</ul>
+<h3>Microwave demonstration</h3>
+<p>A metal grille between a microwave transmitter and receiver acts like a polariser. When the grille wires are parallel to the electric field, the wave is absorbed, and when they are perpendicular it passes. Turning the grille through 90° switches the signal on and off.</p>
+</div>
+</section>
+</main>
+
+<script type="application/json" id="sim-meta">
+{
+ "id": "wave-lab",
+ "title": "Waves and interference lab",
+ "topic": "3",
+ "tabs": [
+  {
+   "id": "t1",
+   "title": "Path difference",
+   "keywords": [
+    "path difference",
+    "=coherence",
+    "=coherent",
+    "=interference",
+    "constructive interference",
+    "destructive interference",
+    "=superposition",
+    "=phasor"
+   ]
+  },
+  {
+   "id": "td",
+   "title": "Double slit",
+   "keywords": [
+    "fringe spacing",
+    "fringe width",
+    "double slit",
+    "young's double slit",
+    "young slits",
+    "white light fringes",
+    "=monochromatic",
+    "=fringe"
+   ]
+  },
+  {
+   "id": "tv",
+   "title": "Double-slit derivation",
+   "keywords": [
+    "double slit equation",
+    "fringe spacing equation",
+    "small angle approximation"
+   ]
+  },
+  {
+   "id": "t2",
+   "title": "Slits and gratings",
+   "keywords": [
+    "diffraction grating",
+    "=diffraction",
+    "single slit",
+    "grating equation",
+    "huygens",
+    "diffraction pattern",
+    "order of maximum"
+   ]
+  },
+  {
+   "id": "t3",
+   "title": "Microwaves",
+   "keywords": [
+    "=microwave",
+    "=microwaves",
+    "microwave experiment"
+   ]
+  },
+  {
+   "id": "tp",
+   "title": "Progressive waves",
+   "keywords": [
+    "=amplitude",
+    "=wavelength",
+    "=frequency",
+    "=period",
+    "phase difference",
+    "=phase",
+    "longitudinal wave",
+    "transverse wave",
+    "progressive wave",
+    "wave speed",
+    "=compression",
+    "=rarefaction",
+    "=displacement"
+   ]
+  },
+  {
+   "id": "ts",
+   "title": "Standing waves",
+   "keywords": [
+    "=node",
+    "=antinode",
+    "stationary wave",
+    "standing wave",
+    "first harmonic",
+    "fundamental",
+    "stationary waves"
+   ]
+  },
+  {
+   "id": "tl",
+   "title": "Polarisation",
+   "keywords": [
+    "=polarisation",
+    "polarised light",
+    "plane polarised",
+    "polariser",
+    "malus's law",
+    "malus law",
+    "polarising filter"
+   ]
+  }
+ ]
+}
+</script>
+<script>
+(function(){
+'use strict';
+if(/[?&]embed=1/.test(location.search))document.documentElement.classList.add('embed');
+var $=function(id){return document.getElementById(id)};
+function css(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+function fit(c,h){
+var dpr=window.devicePixelRatio||1;
+var w=Math.max(220,c.parentElement.clientWidth-24);
+c.style.width=w+'px';c.style.height=h+'px';
+c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);
+var x=c.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
+return {ctx:x,w:w,h:h};
+}
+function wlRGB(l){
+var r=0,g=0,b=0;
+if(l<440){r=-(l-440)/60;b=1}
+else if(l<490){g=(l-440)/50;b=1}
+else if(l<510){g=1;b=-(l-510)/20}
+else if(l<580){r=(l-510)/70;g=1}
+else if(l<645){r=1;g=-(l-645)/65}
+else{r=1}
+var f=1;if(l<420)f=0.3+0.7*(l-380)/40;
+return [r,g,b].map(function(v){return Math.round(255*Math.pow(Math.max(0,v*f),0.8))});
+}
+var reduce=!!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+var active='t1';
+
+/* ================= TAB 1: ripple / path difference ================= */
+var R1={lam:24,d:80,fx:0.78,fy:0.3,t:0,playing:!reduce,w:300,h:260};
+var rctx,off,offctx,img,SC=0.5,RW=1,RH=1;
+function sizeRip(){
+var f=fit($('rip'),260);rctx=f.ctx;R1.w=f.w;R1.h=f.h;
+RW=Math.ceil(f.w*SC);RH=Math.ceil(f.h*SC);
+off=document.createElement('canvas');off.width=RW;off.height=RH;
+offctx=off.getContext('2d');img=offctx.createImageData(RW,RH);
+}
+function srcs(){var cy=R1.h/2;return [{x:28,y:cy-R1.d/2},{x:28,y:cy+R1.d/2}]}
+function pPos(){return {x:R1.fx*R1.w,y:R1.fy*R1.h}}
+function drawRip(){
+if(!rctx)return;
+var k=2*Math.PI/R1.lam,ph=R1.t,S=srcs(),data=img.data,x0=S[0].x;
+var bg=[22,25,28],pos=[29,158,117],neg=[216,90,48];
+for(var j=0;j<RH;j++){
+var y=j/SC,d1=y-S[0].y,d2=y-S[1].y;
+for(var i=0;i<RW;i++){
+var x=i/SC,o=(j*RW+i)*4;
+if(x<x0){data[o]=bg[0];data[o+1]=bg[1];data[o+2]=bg[2];data[o+3]=255;continue}
+var dx=x-x0;
+var r1=Math.sqrt(dx*dx+d1*d1),r2=Math.sqrt(dx*dx+d2*d2);
+var v=(Math.cos(k*r1-ph)+Math.cos(k*r2-ph))*0.5;
+var m=Math.abs(v),t=v>=0?pos:neg;
+data[o]=bg[0]+(t[0]-bg[0])*m;
+data[o+1]=bg[1]+(t[1]-bg[1])*m;
+data[o+2]=bg[2]+(t[2]-bg[2])*m;
+data[o+3]=255;
+}
+}
+offctx.putImageData(img,0,0);
+rctx.imageSmoothingEnabled=true;
+rctx.drawImage(off,0,0,R1.w,R1.h);
+var P=pPos();
+rctx.strokeStyle='rgba(255,255,255,0.75)';rctx.lineWidth=1;
+rctx.beginPath();rctx.moveTo(S[0].x,S[0].y);rctx.lineTo(P.x,P.y);rctx.moveTo(S[1].x,S[1].y);rctx.lineTo(P.x,P.y);rctx.stroke();
+rctx.fillStyle='#fff';
+S.forEach(function(s){rctx.beginPath();rctx.arc(s.x,s.y,4,0,7);rctx.fill()});
+rctx.font='13px system-ui,sans-serif';rctx.textAlign='left';rctx.textBaseline='middle';
+rctx.fillText('S₁',4,S[0].y-14);rctx.fillText('S₂',4,S[1].y+14);
+rctx.beginPath();rctx.arc(P.x,P.y,8,0,7);rctx.fillStyle='rgba(255,255,255,0.25)';rctx.fill();
+rctx.lineWidth=2;rctx.strokeStyle='#fff';rctx.stroke();
+rctx.fillStyle='#fff';rctx.beginPath();rctx.arc(P.x,P.y,2.5,0,7);rctx.fill();
+rctx.fillText('P',P.x+12,P.y-10);
+}
+function updRip(){
+var S=srcs(),P=pPos();
+var r1=Math.hypot(P.x-S[0].x,P.y-S[0].y),r2=Math.hypot(P.x-S[1].x,P.y-S[1].y);
+var l=R1.lam,delta=(r2-r1)/l,m=Math.abs(delta);
+$('r1o').textContent=(r1/l).toFixed(2)+' λ';
+$('r2o').textContent=(r2/l).toFixed(2)+' λ';
+$('pdo').textContent=m.toFixed(2)+' λ';
+var deg=((360*m)%360).toFixed(0);
+$('pho').textContent=deg+'°';
+var h=Math.round(m*2)/2,diff=Math.abs(m-h),res;
+if(diff<0.04){res=(h%1===0)?'Path difference is a whole number of wavelengths: constructive':'Path difference is an odd number of half wavelengths: destructive'}
+else res='In between: partial interference';
+$('reso').textContent=res;
+var k=2*Math.PI/l,a1=-k*r1,a2=-k*r2,u=42,cx=75,cy=75;
+var c=phaCtx;c.clearRect(0,0,150,150);
+c.strokeStyle=css('--line');c.lineWidth=1;c.beginPath();c.arc(cx,cy,u*2,0,7);c.stroke();
+c.beginPath();c.arc(cx,cy,u,0,7);c.stroke();
+function arrow(x1,y1,x2,y2,col,w,dash){
+c.strokeStyle=col;c.fillStyle=col;c.lineWidth=w;c.setLineDash(dash||[]);
+c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();c.setLineDash([]);
+var an=Math.atan2(y2-y1,x2-x1);
+c.beginPath();c.moveTo(x2,y2);c.lineTo(x2-7*Math.cos(an-0.4),y2-7*Math.sin(an-0.4));c.lineTo(x2-7*Math.cos(an+0.4),y2-7*Math.sin(an+0.4));c.closePath();c.fill();
+}
+var t1x=cx+u*Math.cos(a1),t1y=cy-u*Math.sin(a1);
+var t2x=t1x+u*Math.cos(a2),t2y=t1y-u*Math.sin(a2);
+arrow(cx,cy,t1x,t1y,'#1D9E75',2);
+arrow(t1x,t1y,t2x,t2y,'#D85A30',2);
+if(Math.hypot(t2x-cx,t2y-cy)>4)arrow(cx,cy,t2x,t2y,css('--fg'),2,[4,3]);
+var amp=2*Math.abs(Math.cos(Math.PI*delta));
+$('phaCap').textContent='Resultant '+amp.toFixed(2)+' A';
+}
+var phaCtx=(function(){var c=$('pha'),dpr=window.devicePixelRatio||1;c.width=150*dpr;c.height=150*dpr;var x=c.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);return x})();
+function setLabels1(){
+$('r_lamo').textContent=R1.lam+' px';$('r_do').textContent=R1.d+' px';
+}
+$('r_lam').addEventListener('input',function(){R1.lam=+this.value;setLabels1();drawRip();updRip()});
+$('r_d').addEventListener('input',function(){R1.d=+this.value;setLabels1();drawRip();updRip()});
+$('r_play').addEventListener('click',function(){R1.playing=!R1.playing;this.textContent=R1.playing?'Pause':'Play'});
+(function(){
+var rp=$('rip'),down=false;
+function setP(e){
+var b=rp.getBoundingClientRect();
+var x=Math.max(60,Math.min(R1.w-10,e.clientX-b.left));
+var y=Math.max(10,Math.min(R1.h-10,e.clientY-b.top));
+R1.fx=x/R1.w;R1.fy=y/R1.h;drawRip();updRip();
+}
+rp.addEventListener('pointerdown',function(e){down=true;try{rp.setPointerCapture(e.pointerId)}catch(_){}setP(e)});
+rp.addEventListener('pointermove',function(e){if(down)setP(e)});
+['pointerup','pointercancel'].forEach(function(ev){rp.addEventListener(ev,function(){down=false})});
+})();
+if(reduce)$('r_play').textContent='Play';
+
+/* ================= TAB 2: slits and gratings ================= */
+var G={mode:'single',gs:null,gp:null};
+function sizeG(){G.gs=fit($('gStrip'),80);G.gp=fit($('gPlot'),150)}
+function gParams(){
+return {L:+$('s2lam').value,a:+$('s2a').value*1000,lines:+$('s2lines').value,N:+$('s2N').value,white:$('s2white').checked};
+}
+function inten(s,L,p){
+var a=G.mode==='single'?p.a:1000;
+var b=Math.PI*a*s/L,env=Math.abs(b)<1e-9?1:Math.pow(Math.sin(b)/b,2);
+if(G.mode==='single')return env;
+var dn=1e6/p.lines,al=Math.PI*dn*s/L,sa=Math.sin(al),g;
+if(Math.abs(sa)<1e-9)g=1;else{var q=Math.sin(p.N*al)/(p.N*sa);g=q*q}
+return env*g;
+}
+var SAMP=[],SCOL=[],SUM=[0,0,0];
+for(var wl=400;wl<=700;wl+=10){var c0=wlRGB(wl);SAMP.push(wl);SCOL.push(c0);SUM[0]+=c0[0];SUM[1]+=c0[1];SUM[2]+=c0[2]}
+function field(deg,p){
+var s=Math.sin(deg*Math.PI/180);
+if(!(G.mode==='grating'&&p.white)){
+var I=inten(s,p.L,p),c=wlRGB(p.L);
+return {I:I,rgb:[c[0]*I,c[1]*I,c[2]*I]};
+}
+var a=[0,0,0],tot=0;
+for(var k=0;k<SAMP.length;k++){var Ik=inten(s,SAMP[k],p);a[0]+=SCOL[k][0]*Ik;a[1]+=SCOL[k][1]*Ik;a[2]+=SCOL[k][2]*Ik;tot+=Ik}
+return {I:tot/SAMP.length,rgb:[a[0]/SUM[0]*255,a[1]/SUM[1]*255,a[2]/SUM[2]*255]};
+}
+function drawG(){
+if(!G.gs)return;
+var p=gParams(),RG=G.mode==='single'?6:60;
+var s=G.gs,ctx=s.ctx;
+ctx.fillStyle='#000';ctx.fillRect(0,0,s.w,s.h);
+var SS=3;
+for(var px=0;px<s.w;px++){
+var r=0,g=0,b=0;
+for(var q=0;q<SS;q++){
+var deg=((px+(q+0.5)/SS)/s.w-0.5)*2*RG;
+var f=field(deg,p).rgb;r+=f[0];g+=f[1];b+=f[2];
+}
+ctx.fillStyle='rgb('+Math.round(r/SS)+','+Math.round(g/SS)+','+Math.round(b/SS)+')';
+ctx.fillRect(px,0,1,s.h);
+}
+var pl=G.gp,c=pl.ctx,mL=8,mR=8,mT=22,mB=26,pw=pl.w-mL-mR,ph=pl.h-mT-mB;
+var X=function(d){return mL+(d+RG)/(2*RG)*pw},Y=function(i){return mT+(1-i)*ph};
+var fg=css('--fg'),mu=css('--muted'),ln=css('--line');
+c.clearRect(0,0,pl.w,pl.h);
+c.strokeStyle=ln;c.lineWidth=1;c.beginPath();c.moveTo(mL,Y(0));c.lineTo(mL+pw,Y(0));c.stroke();
+c.font='11px system-ui,sans-serif';c.fillStyle=mu;c.textAlign='center';c.textBaseline='top';
+var ticks=G.mode==='single'?[-6,-3,0,3,6]:[-60,-30,0,30,60];
+ticks.forEach(function(t){c.beginPath();c.moveTo(X(t),Y(0));c.lineTo(X(t),Y(0)+4);c.stroke();c.fillText(t+'°',X(t),Y(0)+6)});
+var n=Math.max(600,Math.round(pw*3));
+c.beginPath();
+for(var i=0;i<=n;i++){var d=-RG+2*RG*i/n;var px2=X(d),py=Y(field(d,p).I);if(i===0)c.moveTo(px2,py);else c.lineTo(px2,py)}
+c.lineTo(mL+pw,Y(0));c.lineTo(mL,Y(0));c.closePath();
+var col=wlRGB(p.L);
+c.fillStyle=(G.mode==='grating'&&p.white)?'rgba(150,150,150,0.35)':'rgba('+col[0]+','+col[1]+','+col[2]+',0.35)';
+c.fill();
+c.beginPath();
+for(var j=0;j<=n;j++){var d2=-RG+2*RG*j/n;var qx=X(d2),qy=Y(field(d2,p).I);if(j===0)c.moveTo(qx,qy);else c.lineTo(qx,qy)}
+c.strokeStyle=fg;c.lineWidth=1.25;c.stroke();
+if(G.mode==='grating'&&!p.white){
+var dn=1e6/p.lines;
+c.fillStyle=fg;c.textBaseline='bottom';c.font='11px system-ui,sans-serif';
+for(var m=-5;m<=5;m++){
+var sv=m*p.L/dn;if(Math.abs(sv)>=Math.sin(RG*Math.PI/180))continue;
+var dg=Math.asin(sv)*180/Math.PI;
+var pk=inten(sv,p.L,p);
+c.fillText('n='+m,X(dg),Math.max(12,Y(pk)-3));
+}
+}
+updG(p);
+}
+function updG(p){
+var out='',cap='',key='';
+if(G.mode==='single'){
+var s1=p.L/p.a,th=Math.asin(s1)*180/Math.PI,wmm=2*Math.tan(Math.asin(s1))*1000;
+key='Single slit: first minimum at a sin θ = λ.';
+cap='Single slit, 6° either side of the centre. Top: screen. Bottom: relative intensity.';
+out='First minimum at ±'+th.toFixed(2)+'° (a sin θ = λ). On a screen 1 m away the central maximum is about '+wmm.toFixed(0)+' mm wide.';
+}else{
+var dn=1e6/p.lines,dum=dn/1000;
+key='Grating: maxima at d sin θ = nλ.';
+cap='Grating with '+p.N+' slits lit, 60° either side of the centre. Top: screen. Bottom: relative intensity.';
+if(!p.white){
+var nmax=Math.ceil(dn/p.L)-1,parts=[];
+for(var n=1;n<=Math.min(nmax,4);n++)parts.push('n='+n+': '+(Math.asin(n*p.L/dn)*180/Math.PI).toFixed(1)+'°');
+out='d = '+dum.toFixed(2)+' µm. Highest order n = '+nmax+'. Angles: '+(parts.length?parts.join(', '):'none')+(nmax>4?' …':'')+'.';
+}else{
+var parts2=[];
+for(var n2=1;n2<=3;n2++){
+var s4=n2*400/dn;if(s4>=1)break;
+var lo=(Math.asin(s4)*180/Math.PI).toFixed(1),s7=n2*700/dn;
+parts2.push('n='+n2+': '+lo+'° to '+(s7<1?(Math.asin(s7)*180/Math.PI).toFixed(1)+'°':'off the edge'));
+}
+out='d = '+dum.toFixed(2)+' µm. Each order is a spectrum, violet nearest the centre. '+parts2.join('; ')+'.';
+}
+}
+$('g_key').textContent=key;$('gCap').textContent=cap;$('gInfo').textContent=out;
+}
+function setLabels2(){
+$('s2lamo').textContent=(G.mode==='grating'&&$('s2white').checked)?'400–700 nm':$('s2lam').value+' nm';
+$('s2ao').textContent=$('s2a').value+' µm';
+$('s2lineso').textContent=$('s2lines').value;
+$('s2No').textContent=$('s2N').value;
+$('s2lam').disabled=(G.mode==='grating'&&$('s2white').checked);
+}
+['s2lam','s2a','s2lines','s2N','s2white'].forEach(function(id){
+$(id).addEventListener('input',function(){setLabels2();drawG()});
+$(id).addEventListener('change',function(){setLabels2();drawG()});
+});
+function setMode(m){
+G.mode=m;
+$('mSingle').classList.toggle('on',m==='single');$('mSingle').setAttribute('aria-pressed',m==='single');
+$('mGrat').classList.toggle('on',m==='grating');$('mGrat').setAttribute('aria-pressed',m==='grating');
+$('grpSingle').hidden=m!=='single';$('grpGrat').hidden=m!=='grating';
+setLabels2();drawG();
+}
+$('mSingle').addEventListener('click',function(){setMode('single')});
+$('mGrat').addEventListener('click',function(){setMode('grating')});
+
+/* ================= TAB 3: microwaves ================= */
+var M={lam:2.8,u:6,t:0,playing:!reduce,practice:false,reveal:false,both:false,rec:[],ms:null,mg:null};
+function sizeM(){M.ms=fit($('mw'),190);M.mg=fit($('mwg'),140)}
+function MX(u,w){return 34+u/30*(w-34-26)}
+function vis(){return !M.practice||M.reveal}
+function sig(u){return Math.abs(Math.sin(2*Math.PI*u/M.lam))}
+function drawMW(){
+if(!M.ms)return;
+var s=M.ms,c=s.ctx,w=s.w,h=s.h,cy=108,A=32;
+var fg=css('--fg'),mu=css('--muted'),ln=css('--line'),ac=css('--accent');
+c.clearRect(0,0,w,h);
+var x0=MX(0,w),x1=MX(30,w);
+c.strokeStyle=ln;c.lineWidth=1;c.beginPath();c.moveTo(x0,cy);c.lineTo(x1,cy);c.stroke();
+c.fillStyle=mu;c.fillRect(x0-8,cy-74,8,148);
+c.beginPath();c.moveTo(x1+2,cy-9);c.lineTo(x1+20,cy-24);c.lineTo(x1+20,cy+24);c.lineTo(x1+2,cy+9);c.closePath();c.fill();
+c.font='12px system-ui,sans-serif';c.fillStyle=mu;c.textBaseline='top';
+c.textAlign='left';c.fillText('Metal plate',6,6);
+c.textAlign='right';c.fillText('Emitter',w-4,6);
+var k=2*Math.PI/M.lam;
+if(vis()){
+c.setLineDash([4,4]);c.strokeStyle=ln;c.lineWidth=1;
+c.beginPath();for(var px=x0;px<=x1;px+=2){var u=(px-x0)/(x1-x0)*30;var e=2*A*Math.abs(Math.sin(k*u));if(px===x0)c.moveTo(px,cy-e);else c.lineTo(px,cy-e)}c.stroke();
+c.beginPath();for(var pz=x0;pz<=x1;pz+=2){var uz=(pz-x0)/(x1-x0)*30;var ez=2*A*Math.abs(Math.sin(k*uz));if(pz===x0)c.moveTo(pz,cy+ez);else c.lineTo(pz,cy+ez)}c.stroke();
+c.setLineDash([]);
+if(M.both){
+c.lineWidth=1;c.strokeStyle='#378ADD';c.beginPath();
+for(var pa=x0;pa<=x1;pa+=2){var ua=(pa-x0)/(x1-x0)*30;var ya=cy-A*Math.cos(M.t+k*ua);if(pa===x0)c.moveTo(pa,ya);else c.lineTo(pa,ya)}c.stroke();
+c.strokeStyle='#D85A30';c.beginPath();
+for(var pb=x0;pb<=x1;pb+=2){var ub=(pb-x0)/(x1-x0)*30;var yb=cy+A*Math.cos(M.t-k*ub);if(pb===x0)c.moveTo(pb,yb);else c.lineTo(pb,yb)}c.stroke();
+}
+c.strokeStyle=ac;c.lineWidth=2.5;c.beginPath();
+for(var pr=x0;pr<=x1;pr+=2){var ur=(pr-x0)/(x1-x0)*30;var yr=cy-A*(Math.cos(M.t+k*ur)-Math.cos(M.t-k*ur));if(pr===x0)c.moveTo(pr,yr);else c.lineTo(pr,yr)}c.stroke();
+}else{
+c.fillStyle=mu;c.textAlign='center';c.textBaseline='middle';
+c.fillText('Wave hidden. Use the meter, as in the real experiment.',(x0+x1)/2,cy-40);
+}
+var xp=MX(M.u,w);
+c.strokeStyle=fg;c.lineWidth=1.5;c.beginPath();c.moveTo(xp,cy-80);c.lineTo(xp,cy+80);c.stroke();
+c.fillStyle=fg;c.beginPath();c.moveTo(xp-6,cy+92);c.lineTo(xp+6,cy+92);c.lineTo(xp,cy+80);c.closePath();c.fill();
+c.textAlign='center';c.textBaseline='top';c.fillStyle=mu;c.fillText('Probe',xp,cy+94);
+if(vis()){
+var yp=cy-A*(Math.cos(M.t+k*M.u)-Math.cos(M.t-k*M.u));
+c.fillStyle=ac;c.beginPath();c.arc(xp,yp,4,0,7);c.fill();
+}
+}
+function drawMG(){
+if(!M.mg)return;
+var g=M.mg,c=g.ctx,w=g.w,h=g.h,mT=14,mB=30,ph=h-mT-mB;
+var fg=css('--fg'),mu=css('--muted'),ln=css('--line'),ac=css('--accent');
+var Y=function(v){return mT+(1-v)*ph};
+c.clearRect(0,0,w,h);
+c.strokeStyle=ln;c.lineWidth=1;c.beginPath();c.moveTo(MX(0,w),Y(0));c.lineTo(MX(30,w),Y(0));c.stroke();
+c.font='11px system-ui,sans-serif';c.fillStyle=mu;c.textAlign='center';c.textBaseline='top';
+for(var t=0;t<=30;t+=5){c.beginPath();c.moveTo(MX(t,w),Y(0));c.lineTo(MX(t,w),Y(0)+4);c.stroke();c.fillText(t,MX(t,w),Y(0)+6)}
+c.textAlign='right';c.fillText('distance from plate (cm)',w-4,Y(0)+18);
+c.textAlign='left';c.textBaseline='top';c.fillText('signal',4,2);
+var k=2*Math.PI/M.lam;
+if(vis()){
+c.strokeStyle=fg;c.lineWidth=1.5;c.beginPath();
+for(var i=0;i<=300;i++){var u=30*i/300;var px=MX(u,w),py=Y(sig(u));if(i===0)c.moveTo(px,py);else c.lineTo(px,py)}
+c.stroke();
+c.fillStyle=ac;
+for(var n=0;n*M.lam/2<=30.001;n++){var un=n*M.lam/2;c.beginPath();c.arc(MX(un,w),Y(0),3.5,0,7);c.fill()}
+var a=M.lam/2,b=M.lam;
+if(b<=30){
+var ya=Y(0)-12;
+c.strokeStyle=ac;c.lineWidth=1.5;c.beginPath();c.moveTo(MX(a,w),ya);c.lineTo(MX(b,w),ya);c.moveTo(MX(a,w),ya-4);c.lineTo(MX(a,w),ya+4);c.moveTo(MX(b,w),ya-4);c.lineTo(MX(b,w),ya+4);c.stroke();
+c.fillStyle=ac;c.textAlign='center';c.textBaseline='bottom';c.font='12px system-ui,sans-serif';
+c.fillText('λ/2 = '+(M.lam/2).toFixed(2)+' cm',(MX(a,w)+MX(b,w))/2,ya-5);
+}
+}
+c.fillStyle=ac;
+M.rec.forEach(function(r){c.beginPath();c.arc(MX(r.u,w),Y(r.s),4,0,7);c.fill()});
+var xp=MX(M.u,w);
+c.setLineDash([3,3]);c.strokeStyle=mu;c.beginPath();c.moveTo(xp,mT);c.lineTo(xp,Y(0));c.stroke();c.setLineDash([]);
+c.strokeStyle=fg;c.lineWidth=2;c.fillStyle=css('--card');c.beginPath();c.arc(xp,Y(sig(M.u)),5,0,7);c.fill();c.stroke();
+}
+function updMW(){
+var s=sig(M.u);
+$('msig').textContent=Math.round(s*100)+' %';
+$('mbar').style.width=(s*100)+'%';
+$('mUo').textContent=M.u.toFixed(1)+' cm';
+$('mLamo').textContent=M.lam.toFixed(1)+' cm';
+var info;
+if(vis()){
+var f=30/M.lam;
+info='Node spacing λ/2 = '+(M.lam/2).toFixed(2)+' cm, so λ = '+M.lam.toFixed(2)+' cm and f = c / λ = '+f.toFixed(1)+' GHz (using c = 3.00 × 10⁸ m/s).';
+}else{
+info='Slide the probe, press Record reading at each position, and find the distance between minima. Then press Reveal to check.';
+}
+$('mwInfo').textContent=info;
+$('mReveal').textContent=M.reveal?'Hide':'Reveal';
+}
+function redrawM(){drawMW();drawMG();updMW()}
+$('mU').addEventListener('input',function(){M.u=+this.value;redrawM()});
+$('mLam').addEventListener('input',function(){M.lam=+this.value;redrawM()});
+$('mBoth').addEventListener('change',function(){M.both=this.checked;drawMW()});
+$('mPlay').addEventListener('click',function(){M.playing=!M.playing;this.textContent=M.playing?'Pause':'Play'});
+if(reduce)$('mPlay').textContent='Play';
+$('mPractice').addEventListener('change',function(){
+M.practice=this.checked;M.reveal=false;M.rec=[];
+$('mPracBtns').hidden=!M.practice;
+$('mLamGrp').hidden=M.practice;
+$('mBothW').hidden=M.practice;
+if(M.practice)M.lam=Math.round((2+Math.random()*2)*10)/10;
+else{M.lam=+$('mLam').value}
+redrawM();
+});
+$('mRec').addEventListener('click',function(){M.rec.push({u:M.u,s:sig(M.u)});drawMG()});
+$('mClear').addEventListener('click',function(){M.rec=[];drawMG()});
+$('mReveal').addEventListener('click',function(){M.reveal=!M.reveal;redrawM()});
+$('mNew').addEventListener('click',function(){
+var old=M.lam,n=old;
+while(Math.abs(n-old)<0.3)n=Math.round((2+Math.random()*2)*10)/10;
+M.lam=n;M.reveal=false;M.rec=[];redrawM();
+});
+
+/* ================= DOUBLE SLIT ================= */
+var DS={st:null,pl:null};
+function sizeDS(){DS.st=fit($('dsStrip'),90);DS.pl=fit($('dsPlot'),140)}
+function dsInt(x,L,d,D){var c=Math.cos(Math.PI*d*x*1000/(L*D));return c*c}
+function dsField(x,L,d,D,wh){
+if(!wh){var I=dsInt(x,L,d,D),c=wlRGB(L);return {I:I,rgb:[c[0]*I,c[1]*I,c[2]*I]}}
+var a=[0,0,0],tot=0;
+for(var k=0;k<SAMP.length;k++){var Ik=dsInt(x,SAMP[k],d,D);a[0]+=SCOL[k][0]*Ik;a[1]+=SCOL[k][1]*Ik;a[2]+=SCOL[k][2]*Ik;tot+=Ik}
+return {I:tot/SAMP.length,rgb:[a[0]/SUM[0]*255,a[1]/SUM[1]*255,a[2]/SUM[2]*255]};
+}
+function drawDS(){
+if(!DS.st)return;
+var L=+$('dsLam').value,d=+$('dsd').value,D=+$('dsD').value,wh=$('dsWhite').checked,R=12;
+var w=L*D/(d*1000);
+$('dsLamo').textContent=wh?'400–700 nm':L+' nm';
+$('dsLam').disabled=wh;
+$('dsdo').textContent=d.toFixed(2)+' mm';
+$('dsDo').textContent=D.toFixed(1)+' m';
+$('dsW').textContent=wh?(400*D/(d*1000)).toFixed(2)+' to '+(700*D/(d*1000)).toFixed(2)+' mm':w.toFixed(2)+' mm';
+var s=DS.st,ctx=s.ctx;
+ctx.fillStyle='#000';ctx.fillRect(0,0,s.w,s.h);
+for(var px=0;px<s.w;px++){
+var f=dsField((px/s.w-0.5)*2*R,L,d,D,wh).rgb;
+ctx.fillStyle='rgb('+Math.round(f[0])+','+Math.round(f[1])+','+Math.round(f[2])+')';
+ctx.fillRect(px,0,1,s.h);
+}
+var p=DS.pl,g=p.ctx,mL=8,mR=8,mT=30,mB=24,pw=p.w-mL-mR,ph=p.h-mT-mB;
+var X=function(x){return mL+(x+R)/(2*R)*pw},Y=function(i){return mT+(1-i)*ph};
+var fg=css('--fg'),mu=css('--muted'),ln=css('--line');
+g.clearRect(0,0,p.w,p.h);
+g.strokeStyle=ln;g.lineWidth=1;g.beginPath();g.moveTo(mL,Y(0));g.lineTo(mL+pw,Y(0));g.stroke();
+g.font='11px system-ui,sans-serif';g.fillStyle=mu;g.textAlign='center';g.textBaseline='top';
+[-10,-5,0,5,10].forEach(function(m){g.beginPath();g.moveTo(X(m),Y(0));g.lineTo(X(m),Y(0)+4);g.stroke();g.fillText(m+' mm',X(m),Y(0)+6)});
+var n=Math.max(400,Math.round(pw));
+g.beginPath();
+for(var i=0;i<=n;i++){var x=-R+2*R*i/n;var qx=X(x),qy=Y(dsField(x,L,d,D,wh).I);if(i===0)g.moveTo(qx,qy);else g.lineTo(qx,qy)}
+g.lineTo(mL+pw,Y(0));g.lineTo(mL,Y(0));g.closePath();
+var col=wlRGB(L);
+g.fillStyle=wh?'rgba(150,150,150,0.35)':'rgba('+col[0]+','+col[1]+','+col[2]+',0.35)';
+g.fill();
+g.beginPath();
+for(var j=0;j<=n;j++){var x2=-R+2*R*j/n;var rx=X(x2),ry=Y(dsField(x2,L,d,D,wh).I);if(j===0)g.moveTo(rx,ry);else g.lineTo(rx,ry)}
+g.strokeStyle=fg;g.lineWidth=1.25;g.stroke();
+g.strokeStyle=fg;g.fillStyle=fg;g.lineWidth=1.5;g.textBaseline='alphabetic';g.textAlign='center';g.font='12px system-ui,sans-serif';
+if(wh){g.fillText('Colours separate away from the centre',p.w/2,18)}
+else if(w<=R){
+var x0=X(0),x1=X(w),by=20;
+g.beginPath();g.moveTo(x0,by);g.lineTo(x1,by);g.moveTo(x0,by-4);g.lineTo(x0,by+4);g.moveTo(x1,by-4);g.lineTo(x1,by+4);g.stroke();
+var label='w = '+w.toFixed(2)+' mm',tw=g.measureText(label).width;
+var cx=Math.min(Math.max((x0+x1)/2,tw/2+4),p.w-tw/2-4);
+g.fillText(label,cx,by-8);
+g.setLineDash([3,3]);g.strokeStyle=mu;g.lineWidth=1;
+g.beginPath();g.moveTo(x0,by+4);g.lineTo(x0,Y(1));g.moveTo(x1,by+4);g.lineTo(x1,Y(1));g.stroke();
+g.setLineDash([]);
+}else{g.fillText('w = '+w.toFixed(2)+' mm (next fringe is off the screen)',p.w/2,18)}
+}
+['dsLam','dsd','dsD','dsWhite'].forEach(function(id){
+$(id).addEventListener('input',drawDS);$(id).addEventListener('change',drawDS);
+});
+
+/* ================= DERIVATION ================= */
+var vCaps=[
+"Two slits, S₁ and S₂, are a distance d apart. A screen sits a distance D away, and D is much bigger than d.",
+"Light from each slit travels to a point P on the screen. The two paths are slightly different lengths.",
+"Drop a perpendicular from S₁ onto the S₂ ray. Because D is so large the rays are almost parallel, so the coral segment is the extra distance S₂'s light travels.",
+"In the small right-angled triangle, d is the hypotenuse and the path difference is the side opposite θ.",
+"Now the big triangle: x is the height of P above the centre of the pattern, and D is the distance to the screen.",
+"θ is tiny, so sin θ ≈ tan θ. Swap it in and the path difference is d x / D.",
+"For a bright fringe the waves arrive in phase, so the path difference is a whole number of wavelengths, nλ. Rearrange for x.",
+"Take fringes n and n + 1 and subtract. The n cancels, leaving the fringe spacing w. Rearrange for λ, the form in the AQA data booklet."
+];
+var vEqs=[
+{s:2,t:"path difference = S₂P − S₁P"},
+{s:4,t:"path difference = d sin θ"},
+{s:5,t:"tan θ = x / D"},
+{s:6,t:"sin θ ≈ x / D  (θ small)"},
+{s:6,t:"path difference = d x / D"},
+{s:7,t:"d x / D = nλ"},
+{s:7,t:"x = nλD / d"},
+{s:8,t:"w = x(n+1) − x(n) = λD / d"},
+{s:8,t:"λ = w d / D"}
+];
+var vN=vCaps.length,vStep=1,vTimer=null,vBuilt=false;
+function renderV(){
+var dots=$('vDots');
+if(!vBuilt){vBuilt=true;for(var i=0;i<vN;i++){var d=document.createElement('div');d.className='dot';dots.appendChild(d)}}
+document.querySelectorAll('#tv [data-s]').forEach(function(el){el.classList.toggle('on',+el.getAttribute('data-s')<=vStep)});
+$('vStepno').textContent='Step '+vStep+' of '+vN;
+$('vCap').textContent=vCaps[vStep-1];
+var h='';
+vEqs.forEach(function(e){if(e.s<=vStep)h+='<div class="eq'+(e.s===vStep?' new':'')+'">'+e.t+'</div>'});
+$('vEqs').innerHTML=h;
+Array.prototype.forEach.call(dots.children,function(dt,i){dt.classList.toggle('on',i<vStep)});
+$('vBack').disabled=vStep===1;
+$('vNext').disabled=vStep===vN;
+$('vPlay').textContent=vTimer?'Pause':(vStep===vN?'Replay':'Play');
+}
+function vStop(){if(vTimer){clearInterval(vTimer);vTimer=null}}
+function vGo(n){vStep=Math.max(1,Math.min(vN,n));renderV()}
+$('vNext').addEventListener('click',function(){vStop();vGo(vStep+1)});
+$('vBack').addEventListener('click',function(){vStop();vGo(vStep-1)});
+$('vPlay').addEventListener('click',function(){
+if(vTimer){vStop();renderV();return}
+if(vStep===vN)vStep=1;
+renderV();
+vTimer=setInterval(function(){
+if(vStep>=vN){vStop();renderV();return}
+vGo(vStep+1);
+if(vStep>=vN){vStop();renderV()}
+},4200);
+renderV();
+});
+
+/* ================= PROGRESSIVE WAVES ================= */
+var PW={mode:'t',A:0.3,lam:1,f:1,sep:0.25,t:0,playing:!reduce,c1:null,c2:null};
+var PW_L=4,PW_XP=1.0,TEAL='#1D9E75',CORAL='#D85A30';
+function sizePW(){PW.c1=fit($('pwWave'),200);PW.c2=fit($('pwTime'),120)}
+function mod(a,b){return ((a%b)+b)%b}
+function drawPW(){
+var c1=PW.c1;if(!c1)return;
+var ctx=c1.ctx,w=c1.w,h=c1.h,cy=100,ppm=(w-20)/PW_L;
+var X=function(x){return 10+x*ppm};
+var fg=css('--fg'),mu=css('--muted'),ln=css('--line'),ac=css('--accent');
+var k=2*Math.PI/PW.lam,om=2*Math.PI*PW.f,TP=2*Math.PI;
+var xp=PW_XP,xq=Math.min(PW_L-0.05,PW_XP+PW.sep);
+ctx.clearRect(0,0,w,h);
+ctx.strokeStyle=ln;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(X(0),cy);ctx.lineTo(X(PW_L),cy);ctx.stroke();
+ctx.font='12px system-ui,sans-serif';ctx.textAlign='center';
+if(PW.mode==='t'){
+ctx.strokeStyle=ac;ctx.lineWidth=2.5;ctx.beginPath();
+for(var px=0;px<=w-20;px+=2){var x=px/ppm;var y=cy-100*PW.A*Math.sin(k*x-om*PW.t);if(px===0)ctx.moveTo(10+px,y);else ctx.lineTo(10+px,y)}
+ctx.stroke();
+ctx.fillStyle=mu;
+for(var xi=0;xi<=PW_L+0.001;xi+=0.1){ctx.beginPath();ctx.arc(X(xi),cy-100*PW.A*Math.sin(k*xi-om*PW.t),2,0,7);ctx.fill()}
+var xc=mod(om*PW.t+Math.PI/2,TP)/k;
+while(xc<0.3)xc+=PW.lam;
+var top=cy-100*PW.A;
+if(xc<=PW_L-0.05){
+ctx.strokeStyle=mu;ctx.setLineDash([3,3]);ctx.beginPath();ctx.moveTo(X(xc),cy);ctx.lineTo(X(xc),top);ctx.stroke();ctx.setLineDash([]);
+ctx.fillStyle=fg;ctx.textAlign='left';ctx.fillText('A',X(xc)+5,(cy+top)/2+4);
+}
+if(xc+PW.lam<=PW_L-0.05){
+var ya=top-18;
+ctx.strokeStyle=fg;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(X(xc),ya);ctx.lineTo(X(xc+PW.lam),ya);
+ctx.moveTo(X(xc),ya-4);ctx.lineTo(X(xc),ya+4);ctx.moveTo(X(xc+PW.lam),ya-4);ctx.lineTo(X(xc+PW.lam),ya+4);ctx.stroke();
+ctx.fillStyle=fg;ctx.textAlign='center';ctx.fillText('λ',X(xc+PW.lam/2),ya-6);
+}
+[[xp,TEAL,'P'],[xq,CORAL,'Q']].forEach(function(o){
+var yy=cy-100*PW.A*Math.sin(k*o[0]-om*PW.t);
+ctx.strokeStyle=o[1];ctx.setLineDash([3,3]);ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(X(o[0]),cy+70);ctx.lineTo(X(o[0]),yy);ctx.stroke();ctx.setLineDash([]);
+ctx.fillStyle=o[1];ctx.beginPath();ctx.arc(X(o[0]),yy,5,0,7);ctx.fill();
+ctx.textAlign='center';ctx.fillText(o[2],X(o[0]),cy+86);
+});
+}else{
+var sA=(PW.A/0.5)*0.6*PW.lam/TP;
+ctx.strokeStyle=fg;ctx.lineWidth=1.5;ctx.beginPath();
+for(var xj=0.04;xj<PW_L;xj+=0.08){var pxx=X(xj+sA*Math.sin(k*xj-om*PW.t));ctx.moveTo(pxx,cy-34);ctx.lineTo(pxx,cy+34)}
+ctx.stroke();
+var xcm=mod(om*PW.t+Math.PI,TP)/k,xrf=mod(om*PW.t,TP)/k;
+ctx.fillStyle=mu;ctx.textAlign='center';
+for(var a=xcm;a<=PW_L;a+=PW.lam){if(a>0.05)ctx.fillText('C',X(a),cy-44)}
+for(var b=xrf;b<=PW_L;b+=PW.lam){if(b>0.05)ctx.fillText('R',X(b),cy-44)}
+var xs=xcm;while(xs<0.3)xs+=PW.lam;
+if(xs+PW.lam<=PW_L-0.05){
+var yl=cy-64;
+ctx.strokeStyle=fg;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(X(xs),yl);ctx.lineTo(X(xs+PW.lam),yl);
+ctx.moveTo(X(xs),yl-4);ctx.lineTo(X(xs),yl+4);ctx.moveTo(X(xs+PW.lam),yl-4);ctx.lineTo(X(xs+PW.lam),yl+4);ctx.stroke();
+ctx.fillStyle=fg;ctx.fillText('λ',X(xs+PW.lam/2),yl-6);
+}
+[[xp,TEAL,'P'],[xq,CORAL,'Q']].forEach(function(o){
+var pxo=X(o[0]+sA*Math.sin(k*o[0]-om*PW.t));
+ctx.strokeStyle=o[1];ctx.lineWidth=3.5;ctx.beginPath();ctx.moveTo(pxo,cy-40);ctx.lineTo(pxo,cy+40);ctx.stroke();
+ctx.fillStyle=o[1];ctx.textAlign='center';ctx.fillText(o[2],pxo,cy+58);
+});
+}
+var c2=PW.c2,g=c2.ctx,w2=c2.w,h2=c2.h,cy2=62,sc=45*(PW.A/0.5),Tw=3;
+var XT=function(tau){return 10+(tau-(PW.t-Tw))/Tw*(w2-20)};
+g.clearRect(0,0,w2,h2);
+g.strokeStyle=ln;g.lineWidth=1;g.beginPath();g.moveTo(10,cy2);g.lineTo(w2-10,cy2);g.stroke();
+[[xp,TEAL],[xq,CORAL]].forEach(function(o,ix){
+g.strokeStyle=o[1];g.lineWidth=2;g.beginPath();
+for(var q=0;q<=w2-20;q+=2){var tau=PW.t-Tw+q/(w2-20)*Tw;var yv=cy2-sc*Math.sin(k*o[0]-om*tau);if(q===0)g.moveTo(10+q,yv);else g.lineTo(10+q,yv)}
+g.stroke();
+g.fillStyle=o[1];g.beginPath();g.arc(w2-10,cy2-sc*Math.sin(k*o[0]-om*PW.t),4,0,7);g.fill();
+});
+var del=mod(Math.PI/2-(k*xp-om*PW.t),TP)/om,t0=PW.t-del,T=1/PW.f;
+if(t0-T>=PW.t-Tw){
+var ya2=cy2-sc-12;
+g.strokeStyle=fg;g.lineWidth=1.5;g.beginPath();g.moveTo(XT(t0-T),ya2);g.lineTo(XT(t0),ya2);
+g.moveTo(XT(t0-T),ya2-4);g.lineTo(XT(t0-T),ya2+4);g.moveTo(XT(t0),ya2-4);g.lineTo(XT(t0),ya2+4);g.stroke();
+g.fillStyle=fg;g.font='12px system-ui,sans-serif';g.textAlign='center';g.textBaseline='alphabetic';g.fillText('T',(XT(t0-T)+XT(t0))/2,ya2-6);
+}
+g.font='11px system-ui,sans-serif';g.fillStyle=mu;g.textAlign='left';g.textBaseline='top';g.fillText('time →',w2-52,cy2+4);
+}
+function updPW(){
+$('pwAo').textContent=PW.A.toFixed(2)+' m';
+$('pwLamo').textContent=PW.lam.toFixed(2)+' m';
+$('pwFo').textContent=PW.f.toFixed(1)+' Hz';
+var sepEff=Math.min(PW.sep,PW_L-0.05-PW_XP);
+$('pwSepo').textContent=sepEff.toFixed(2)+' m';
+var ratio=sepEff/PW.lam,deg=mod(360*ratio,360),near=function(v,t){return Math.abs(v-t)<0.03};
+var frac=mod(ratio,1),rel;
+if(sepEff===0||near(frac,0)||near(frac,1))rel='P and Q are in phase.';
+else if(near(frac,0.5))rel='P and Q are in antiphase.';
+else rel='P and Q are out of step by '+deg.toFixed(0)+'°.';
+$('pwInfo').textContent='λ = '+PW.lam.toFixed(2)+' m, f = '+PW.f.toFixed(1)+' Hz, T = '+(1/PW.f).toFixed(2)+' s, v = fλ = '+(PW.f*PW.lam).toFixed(2)+' m/s. Phase difference between P and Q = 360° × '+sepEff.toFixed(2)+' / '+PW.lam.toFixed(2)+' = '+deg.toFixed(0)+'°. '+rel;
+$('pwCap').textContent=PW.mode==='t'?'Transverse wave travelling to the right. Dots are particles moving up and down.':'Longitudinal wave travelling to the right. Each bar is a particle moving left and right. C: compression, R: rarefaction.';
+}
+[['pwA','A'],['pwLam','lam'],['pwF','f'],['pwSep','sep']].forEach(function(p){
+$(p[0]).addEventListener('input',function(){PW[p[1]]=+this.value;updPW();drawPW()});
+});
+function setPWMode(m){
+PW.mode=m;
+$('pwT').classList.toggle('on',m==='t');$('pwT').setAttribute('aria-pressed',m==='t');
+$('pwL').classList.toggle('on',m==='l');$('pwL').setAttribute('aria-pressed',m==='l');
+updPW();drawPW();
+}
+$('pwT').addEventListener('click',function(){setPWMode('t')});
+$('pwL').addEventListener('click',function(){setPWMode('l')});
+$('pwPlay').addEventListener('click',function(){PW.playing=!PW.playing;this.textContent=PW.playing?'Pause':'Play'});
+if(reduce)$('pwPlay').textContent='Play';
+
+/* ================= STANDING WAVES ================= */
+var ST={type:'string',i:2,L:1,v:200,t:0,playing:!reduce,env:true,c:null};
+function sizeST(){ST.c=fit($('stCan'),210)}
+function stH(){return ST.type==='closed'?2*ST.i-1:ST.i}
+function stLam(){var h=stH();return ST.type==='closed'?4*ST.L/h:2*ST.L/h}
+function stAmp(x){
+var h=stH(),k=Math.PI*h/(ST.type==='closed'?2*ST.L:ST.L);
+return ST.type==='open'?Math.cos(k*x):Math.sin(k*x);
+}
+function stPts(){
+var h=stH(),L=ST.L,n=[],a=[],j;
+if(ST.type==='string'){for(j=0;j<=h;j++)n.push(j*L/h);for(j=0;j<h;j++)a.push((j+0.5)*L/h)}
+else if(ST.type==='open'){for(j=0;j<=h;j++)a.push(j*L/h);for(j=0;j<h;j++)n.push((j+0.5)*L/h)}
+else{for(j=0;j<=(h-1)/2;j++){n.push(2*j*L/h);a.push((2*j+1)*L/h)}}
+return {n:n,a:a};
+}
+function ord(n){var s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0])}
+function drawST(){
+var c=ST.c;if(!c)return;
+var ctx=c.ctx,w=c.w,x0=28,x1=w-28,cy=105,A=62;
+var fg=css('--fg'),mu=css('--muted'),ln=css('--line'),ac=css('--accent');
+var X=function(x){return x0+x/ST.L*(x1-x0)};
+ctx.clearRect(0,0,c.w,c.h);
+ctx.lineWidth=1;ctx.strokeStyle=ln;ctx.beginPath();ctx.moveTo(x0,cy);ctx.lineTo(x1,cy);ctx.stroke();
+ctx.font='12px system-ui,sans-serif';ctx.fillStyle=mu;ctx.textBaseline='top';
+if(ST.type==='string'){
+ctx.strokeStyle=mu;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(x0,cy-16);ctx.lineTo(x0,cy+16);ctx.moveTo(x1,cy-16);ctx.lineTo(x1,cy+16);ctx.stroke();
+ctx.textAlign='center';ctx.fillText('fixed',x0,cy+22);ctx.fillText('fixed',x1,cy+22);
+}else{
+ctx.strokeStyle=mu;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x0,cy-80);ctx.lineTo(x1,cy-80);ctx.moveTo(x0,cy+80);ctx.lineTo(x1,cy+80);ctx.stroke();
+if(ST.type==='closed'){ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(x0,cy-80);ctx.lineTo(x0,cy+80);ctx.stroke()}
+ctx.textAlign='center';ctx.fillText(ST.type==='closed'?'closed':'open',x0,cy+86);ctx.fillText('open',x1,cy+86);
+}
+var cs=Math.cos(ST.t);
+if(ST.env){
+ctx.setLineDash([4,4]);ctx.strokeStyle=mu;ctx.lineWidth=1;
+[1,-1].forEach(function(sg){ctx.beginPath();for(var px=x0;px<=x1;px+=2){var x=(px-x0)/(x1-x0)*ST.L;var y=cy-sg*A*Math.abs(stAmp(x));if(px===x0)ctx.moveTo(px,y);else ctx.lineTo(px,y)}ctx.stroke()});
+ctx.setLineDash([]);
+}
+ctx.strokeStyle=ac;ctx.lineWidth=2.5;ctx.beginPath();
+for(var px2=x0;px2<=x1;px2+=2){var xx=(px2-x0)/(x1-x0)*ST.L;var yy=cy-A*stAmp(xx)*cs;if(px2===x0)ctx.moveTo(px2,yy);else ctx.lineTo(px2,yy)}
+ctx.stroke();
+ctx.fillStyle=fg;
+for(var i=0;i<=30;i++){var xi=ST.L*i/30;ctx.beginPath();ctx.arc(X(xi),cy-A*stAmp(xi)*cs,2,0,7);ctx.fill()}
+var pts=stPts();
+ctx.fillStyle=ac;
+pts.n.forEach(function(x){ctx.beginPath();ctx.arc(X(x),cy,4.5,0,7);ctx.fill()});
+ctx.strokeStyle=fg;ctx.lineWidth=1.5;
+pts.a.forEach(function(x){ctx.beginPath();ctx.arc(X(x),cy-A,4,0,7);ctx.stroke()});
+var lam=stLam(),h=stH(),f=ST.v/lam,f1=ST.v/(ST.type==='closed'?4*ST.L:2*ST.L);
+$('stInfo').textContent=ord(h)+' harmonic. λ = '+lam.toFixed(2)+' m, f = v / λ = '+f.toFixed(1)+' Hz (fundamental '+f1.toFixed(1)+' Hz). '+pts.n.length+' nodes and '+pts.a.length+' antinodes, counting the ends.';
+}
+function updST(){
+$('stIo').textContent=ord(stH())+' harmonic';
+$('stLo').textContent=ST.L.toFixed(2)+' m';
+$('stVo').textContent=ST.v+' m/s';
+$('stCap').textContent=ST.type==='string'?'String fixed at both ends. Filled dots are nodes, hollow circles are antinodes. Slowed down.':ST.type==='open'?'Pipe open at both ends, showing air displacement. Antinode at each end. Filled dots are nodes, hollow circles are antinodes.':'Pipe closed at the left, open at the right, showing air displacement. Node at the closed end, antinode at the open end. Only odd harmonics fit.';
+}
+function setSTType(t){
+ST.type=t;
+[['stString','string'],['stOpen','open'],['stClosed','closed']].forEach(function(p){
+$(p[0]).classList.toggle('on',p[1]===t);$(p[0]).setAttribute('aria-pressed',p[1]===t);
+});
+updST();drawST();
+}
+$('stString').addEventListener('click',function(){setSTType('string')});
+$('stOpen').addEventListener('click',function(){setSTType('open')});
+$('stClosed').addEventListener('click',function(){setSTType('closed')});
+$('stI').addEventListener('input',function(){ST.i=+this.value;updST();drawST()});
+$('stL').addEventListener('input',function(){ST.L=+this.value;updST();drawST()});
+$('stV').addEventListener('input',function(){ST.v=+this.value;updST();drawST()});
+$('stEnv').addEventListener('change',function(){ST.env=this.checked;drawST()});
+$('stPlay').addEventListener('click',function(){ST.playing=!ST.playing;this.textContent=ST.playing?'Pause':'Play'});
+if(reduce)$('stPlay').textContent='Play';
+
+/* ================= POLARISATION ================= */
+var PL={th:45,mid:false,phi:45,t:0,playing:!reduce,c:null,g:null};
+function sizePL(){PL.c=fit($('plCan'),150);PL.g=fit($('plGraph'),110)}
+function plChain(){
+var th=PL.th*Math.PI/180,phi=PL.phi*Math.PI/180;
+var st=[{lab:'Unpolarised',un:true,amp:1,I:1,ang:0},{lab:'Polariser',ang:0,amp:1,I:0.5,tx:true}];
+function next(lab,a){var p=st[st.length-1];var amp=p.amp*Math.abs(Math.cos(a-p.ang));st.push({lab:lab,ang:a,amp:amp,I:0.5*amp*amp,tx:true})}
+if(PL.mid)next('Middle',phi);
+next('Analyser',th);
+return st;
+}
+function plIntensity(theta){
+var a=theta*Math.PI/180,phi=PL.phi*Math.PI/180;
+if(PL.mid){var amp=Math.abs(Math.cos(phi))*Math.abs(Math.cos(a-phi));return 0.5*amp*amp}
+return 0.5*Math.pow(Math.cos(a),2);
+}
+function drawPL(){
+var c=PL.c;if(!c)return;
+var ctx=c.ctx,w=c.w,cy=62;
+var fg=css('--fg'),mu=css('--muted'),ln=css('--line'),ac=css('--accent');
+var st=plChain(),n=st.length,r=Math.min(34,w/(2*n)-14);
+ctx.clearRect(0,0,c.w,c.h);
+var cs=Math.cos(PL.t);
+st.forEach(function(s,i){
+var cx=w*(i+0.5)/n;
+ctx.strokeStyle=ln;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.stroke();
+if(s.tx){
+var ax=Math.sin(s.ang),ay=-Math.cos(s.ang);
+ctx.setLineDash([3,3]);ctx.strokeStyle=mu;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(cx-ax*(r+6),cy-ay*(r+6));ctx.lineTo(cx+ax*(r+6),cy+ay*(r+6));ctx.stroke();ctx.setLineDash([]);
+}
+ctx.lineCap='round';
+if(s.un){
+ctx.strokeStyle=fg;ctx.lineWidth=1.5;
+for(var j=0;j<12;j++){
+var an=j*Math.PI/12,len=r*0.9*Math.cos(PL.t+j*1.9);
+ctx.beginPath();ctx.moveTo(cx-Math.sin(an)*len,cy+Math.cos(an)*len);ctx.lineTo(cx+Math.sin(an)*len,cy-Math.cos(an)*len);ctx.stroke();
+}
+}else{
+var len2=r*0.9*s.amp*cs;
+ctx.strokeStyle=ac;ctx.lineWidth=3;
+ctx.beginPath();ctx.moveTo(cx-Math.sin(s.ang)*len2,cy+Math.cos(s.ang)*len2);ctx.lineTo(cx+Math.sin(s.ang)*len2,cy-Math.cos(s.ang)*len2);ctx.stroke();
+}
+ctx.lineCap='butt';
+ctx.font='11px system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='top';
+ctx.fillStyle=fg;ctx.fillText(s.lab,cx,cy+r+14);
+ctx.fillStyle=mu;ctx.fillText(s.un?'I₀':s.I.toFixed(3)+' I₀',cx,cy+r+29);
+if(i<n-1){
+var xa=cx+r+4,xb=w*(i+1.5)/n-r-4;
+if(xb-xa>6){ctx.strokeStyle=mu;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(xa,cy);ctx.lineTo(xb,cy);ctx.stroke();ctx.beginPath();ctx.moveTo(xb,cy);ctx.lineTo(xb-5,cy-3);ctx.lineTo(xb-5,cy+3);ctx.closePath();ctx.fillStyle=mu;ctx.fill()}
+}
+});
+var last=st[n-1],prev=st[n-2];
+var dAng=Math.abs(PL.th-(prev.ang*180/Math.PI));
+$('plInfo').textContent='Angle between the last two axes: '+dAng.toFixed(0)+'°. Final intensity = '+last.I.toFixed(3)+' I₀, which is '+(last.I*100).toFixed(1)+'% of the unpolarised intensity. Each polarised stage follows I = I₀ cos²θ, using the intensity reaching it.';
+var g=PL.g,gc=g.ctx,gw=g.w,gh=g.h,mL=30,mR=8,mT=8,mB=24,pw=gw-mL-mR,ph=gh-mT-mB;
+var GX=function(a){return mL+a/180*pw},GY=function(i){return mT+(1-i/0.5)*ph};
+gc.clearRect(0,0,gw,gh);
+gc.strokeStyle=ln;gc.lineWidth=1;gc.beginPath();gc.moveTo(mL,GY(0));gc.lineTo(mL+pw,GY(0));gc.moveTo(mL,mT);gc.lineTo(mL,GY(0));gc.stroke();
+gc.font='11px system-ui,sans-serif';gc.fillStyle=mu;gc.textAlign='center';gc.textBaseline='top';
+[0,45,90,135,180].forEach(function(a){gc.beginPath();gc.moveTo(GX(a),GY(0));gc.lineTo(GX(a),GY(0)+4);gc.stroke();gc.fillText(a+'°',GX(a),GY(0)+6)});
+gc.textAlign='right';gc.textBaseline='middle';gc.fillText('0.5',mL-4,GY(0.5));gc.fillText('0',mL-4,GY(0));
+gc.strokeStyle=fg;gc.lineWidth=1.5;gc.beginPath();
+for(var a2=0;a2<=180;a2+=1){var yy=GY(plIntensity(a2));if(a2===0)gc.moveTo(GX(a2),yy);else gc.lineTo(GX(a2),yy)}
+gc.stroke();
+gc.fillStyle=ac;gc.beginPath();gc.arc(GX(PL.th),GY(plIntensity(PL.th)),5,0,7);gc.fill();
+}
+function updPL(){
+$('plTho').textContent=PL.th+'°';
+$('plPhio').textContent=PL.phi+'°';
+$('plPhiGrp').hidden=!PL.mid;
+}
+$('plTh').addEventListener('input',function(){PL.th=+this.value;updPL();drawPL()});
+$('plPhi').addEventListener('input',function(){PL.phi=+this.value;updPL();drawPL()});
+$('plMid').addEventListener('change',function(){PL.mid=this.checked;updPL();sizePL();drawPL()});
+$('plPlay').addEventListener('click',function(){PL.playing=!PL.playing;this.textContent=PL.playing?'Pause':'Play'});
+if(reduce)$('plPlay').textContent='Play';
+
+/* ================= tabs, animation loop, resize ================= */
+function showTab(id){
+active=id;
+['t1','td','tv','t2','t3','tp','ts','tl'].forEach(function(t){
+var on=t===id;$(t).hidden=!on;
+var b=$('tab-'+t);b.setAttribute('aria-selected',on?'true':'false');
+});
+if(id==='t1'){sizeRip();setLabels1();drawRip();updRip()}
+if(id==='t2'){sizeG();setLabels2();drawG()}
+if(id==='t3'){sizeM();redrawM()}
+if(id==='td'){sizeDS();drawDS()}
+if(id==='tv'){renderV()}
+if(id==='tp'){sizePW();updPW();drawPW()}
+if(id==='ts'){sizeST();updST();drawST()}
+if(id==='tl'){sizePL();updPL();drawPL()}
+}
+Array.prototype.forEach.call(document.querySelectorAll('.tab'),function(b){
+b.addEventListener('click',function(){showTab(b.getAttribute('data-tab'))});
+});
+var last=0;
+function loop(ts){
+requestAnimationFrame(loop);
+var dt=Math.min(0.1,(ts-last)/1000||0);last=ts;
+if(document.hidden)return;
+if(active==='t1'&&R1.playing){R1.t+=dt*2.6;drawRip()}
+else if(active==='t3'&&M.playing){M.t+=dt*3;drawMW()}
+else if(active==='tp'&&PW.playing){PW.t+=dt;drawPW()}
+else if(active==='ts'&&ST.playing){ST.t+=dt*4.4;drawST()}
+else if(active==='tl'&&PL.playing){PL.t+=dt*4;drawPL()}
+}
+requestAnimationFrame(loop);
+var rt;
+window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){showTab(active)},120)});
+if(window.matchMedia){
+var mq=window.matchMedia('(prefers-color-scheme: dark)');
+var rd=function(){showTab(active)};
+if(mq.addEventListener)mq.addEventListener('change',rd);
+}
+var TABIDS=['t1','td','tv','t2','t3','tp','ts','tl'];
+function fromHash(){var h=(location.hash||'').replace('#','');return TABIDS.indexOf(h)>=0?h:'t1'}
+window.addEventListener('hashchange',function(){showTab(fromHash())});
+showTab(fromHash());
+})();
+</script>
+</body>
+</html>

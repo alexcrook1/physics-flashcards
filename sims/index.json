@@ -1,0 +1,132 @@
+{
+ "entries": [
+  {
+   "file": "wave-lab.html",
+   "sim": "Waves and interference lab",
+   "topic": "3",
+   "tab": "t1",
+   "title": "Path difference",
+   "keywords": [
+    "path difference",
+    "=coherence",
+    "=coherent",
+    "=interference",
+    "constructive interference",
+    "destructive interference",
+    "=superposition",
+    "=phasor"
+   ]
+  },
+  {
+   "file": "wave-lab.html",
+   "sim": "Waves and interference lab",
+   "topic": "3",
+   "tab": "td",
+   "title": "Double slit",
+   "keywords": [
+    "fringe spacing",
+    "fringe width",
+    "double slit",
+    "young's double slit",
+    "young slits",
+    "white light fringes",
+    "=monochromatic",
+    "=fringe"
+   ]
+  },
+  {
+   "file": "wave-lab.html",
+   "sim": "Waves and interference lab",
+   "topic": "3",
+   "tab": "tv",
+   "title": "Double-slit derivation",
+   "keywords": [
+    "double slit equation",
+    "fringe spacing equation",
+    "small angle approximation"
+   ]
+  },
+  {
+   "file": "wave-lab.html",
+   "sim": "Waves and interference lab",
+   "topic": "3",
+   "tab": "t2",
+   "title": "Slits and gratings",
+   "keywords": [
+    "diffraction grating",
+    "=diffraction",
+    "single slit",
+    "grating equation",
+    "huygens",
+    "diffraction pattern",
+    "order of maximum"
+   ]
+  },
+  {
+   "file": "wave-lab.html",
+   "sim": "Waves and interference lab",
+   "topic": "3",
+   "tab": "t3",
+   "title": "Microwaves",
+   "keywords": [
+    "=microwave",
+    "=microwaves",
+    "microwave experiment"
+   ]
+  },
+  {
+   "file": "wave-lab.html",
+   "sim": "Waves and interference lab",
+   "topic": "3",
+   "tab": "tp",
+   "title": "Progressive waves",
+   "keywords": [
+    "=amplitude",
+    "=wavelength",
+    "=frequency",
+    "=period",
+    "phase difference",
+    "=phase",
+    "longitudinal wave",
+    "transverse wave",
+    "progressive wave",
+    "wave speed",
+    "=compression",
+    "=rarefaction",
+    "=displacement"
+   ]
+  },
+  {
+   "file": "wave-lab.html",
+   "sim": "Waves and interference lab",
+   "topic": "3",
+   "tab": "ts",
+   "title": "Standing waves",
+   "keywords": [
+    "=node",
+    "=antinode",
+    "stationary wave",
+    "standing wave",
+    "first harmonic",
+    "fundamental",
+    "stationary waves"
+   ]
+  },
+  {
+   "file": "wave-lab.html",
+   "sim": "Waves and interference lab",
+   "topic": "3",
+   "tab": "tl",
+   "title": "Polarisation",
+   "keywords": [
+    "=polarisation",
+    "polarised light",
+    "plane polarised",
+    "polariser",
+    "malus's law",
+    "malus law",
+    "polarising filter"
+   ]
+  }
+ ]
+}

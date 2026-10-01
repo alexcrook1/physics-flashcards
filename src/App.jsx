@@ -215,6 +215,24 @@ const PHYSICISTS = [
   "Wolfgang Pauli", "Paul Dirac", "Ernest Rutherford", "Michael Faraday"
 ];
 
+// Map physicist names to student IDs for Firebase consistency
+const STUDENT_MAPPING = {
+  // Student 1 (first 6 physicists)
+  "Isaac Newton": "Student 1",
+  "Albert Einstein": "Student 1",
+  "Marie Curie": "Student 1",
+  "Niels Bohr": "Student 1",
+  "Richard Feynman": "Student 1",
+  "Stephen Hawking": "Student 1",
+  // Student 2 (remaining 6 physicists)
+  "Erwin Schrödinger": "Student 2",
+  "Max Planck": "Student 2",
+  "Wolfgang Pauli": "Student 2",
+  "Paul Dirac": "Student 2",
+  "Ernest Rutherford": "Student 2",
+  "Michael Faraday": "Student 2"
+};
+
 // Main App Component
 export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -356,11 +374,13 @@ function StudentInterface({ studentName, onLogout }) {
 
   const fetchAvailableTopics = async () => {
     try {
+      // Map physicist name to Student ID for Firebase lookup
+      const studentId = STUDENT_MAPPING[studentName] || studentName;
       const dbRef = ref(database);
-      const snapshot = await get(child(dbRef, `studentSettings/${studentName}`));
+      const snapshot = await get(child(dbRef, `studentSettings/${studentId}`));
       if (snapshot.exists()) {
         setAvailableTopics(snapshot.val());
-        console.log("✓ Topics loaded from Firebase:", snapshot.val());
+        console.log(`✓ Topics loaded from Firebase for ${studentName} (${studentId}):`, snapshot.val());
       } else {
         // Initialize all topics as disabled for new student
         const topics = {};
@@ -368,7 +388,7 @@ function StudentInterface({ studentName, onLogout }) {
           topics[topicId] = false;
         });
         setAvailableTopics(topics);
-        console.log("✓ New student - topics initialized (all disabled)");
+        console.log(`✓ New student ${studentName} (${studentId}) - topics initialized (all disabled)`);
       }
     } catch (error) {
       console.error("❌ Firebase read failed:", error.message);
@@ -655,6 +675,23 @@ function TeacherInterface({ onLogout }) {
           💾 Firebase connection: Check browser console (F12) for sync status
         </div>
         <button className="logout-button" onClick={onLogout}>Logout</button>
+      </div>
+
+      <div className="teacher-info" style={{ backgroundColor: '#f0f8ff', padding: '10px', margin: '10px', borderRadius: '5px', fontSize: '0.9em', color: '#333' }}>
+        <strong>Student Groups:</strong>
+        <ul style={{ margin: '5px 0', paddingLeft: '20px' }}>
+          {students.map(student => {
+            const physicistsInGroup = Object.entries(STUDENT_MAPPING)
+              .filter(([_, studentId]) => studentId === student)
+              .map(([physicist]) => physicist)
+              .join(', ');
+            return (
+              <li key={student}>
+                <strong>{student}:</strong> {physicistsInGroup}
+              </li>
+            );
+          })}
+        </ul>
       </div>
 
       <div className="teacher-grid">

@@ -322,6 +322,7 @@ function StudentInterface({ studentName, onLogout }) {
   const [sessionActive, setSessionActive] = useState(false);
   const [cardProgress, setCardProgress] = useState({});
   const [sessionDate, setSessionDate] = useState(new Date().toDateString());
+  const [simOpen, setSimOpen] = useState(false); // timer pauses while a simulation is open
 
   useEffect(() => {
     fetchAvailableTopics();
@@ -330,7 +331,7 @@ function StudentInterface({ studentName, onLogout }) {
 
   useEffect(() => {
     let timer;
-    if (sessionActive && timeRemaining > 0) {
+    if (sessionActive && !simOpen && timeRemaining > 0) {
       timer = setInterval(() => {
         setTimeRemaining(prev => prev - 1);
       }, 1000);
@@ -339,7 +340,7 @@ function StudentInterface({ studentName, onLogout }) {
       saveSessionData();
     }
     return () => clearInterval(timer);
-  }, [sessionActive, timeRemaining]);
+  }, [sessionActive, simOpen, timeRemaining]);
 
   const checkSessionDate = async () => {
     const today = new Date().toDateString();
@@ -445,6 +446,7 @@ function StudentInterface({ studentName, onLogout }) {
       onIncorrect={() => handleCardResponse(false)}
       timeRemaining={timeRemaining}
       studentName={studentName}
+      onSimPause={setSimOpen}
       onExit={() => {
         setSessionActive(false);
         setSelectedTopic(null);
@@ -478,10 +480,80 @@ function StudentInterface({ studentName, onLogout }) {
   );
 }
 
+// ---------- Simulations ----------
+// Simulations live in public/sims/. Each declares its own keywords, and
+// scripts/build-sims-index.js turns them into public/sims/index.json at build time.
+const SIM_BASE = `${process.env.PUBLIC_URL || ''}/sims/`;
+
+const normaliseTerm = (s) => ' ' + String(s).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim() + ' ';
+
+// Returns the simulation view whose longest keyword appears in the card's keyword.
+// Keywords starting with "=" must match the whole card keyword.
+function findSimulation(entries, keyword) {
+  const term = normaliseTerm(keyword);
+  let best = null;
+  let bestLength = 0;
+  entries.forEach((entry) => {
+    entry.keywords.forEach((kw) => {
+      // A leading "=" means the card keyword must match exactly (for short generic words)
+      const exact = kw.startsWith('=');
+      const k = normaliseTerm(exact ? kw.slice(1) : kw);
+      const matches = exact ? term === k : term.includes(k);
+      if (matches && k.length > bestLength) {
+        best = entry;
+        bestLength = k.length;
+      }
+    });
+  });
+  return best;
+}
+
+function SimulationOverlay({ entry, onClose }) {
+  const src = `${SIM_BASE}${entry.file}?embed=1${entry.tab ? '#' + entry.tab : ''}`;
+  return (
+    <div className="sim-overlay" role="dialog" aria-modal="true" aria-label={entry.title}>
+      <div className="sim-overlay-header">
+        <span className="sim-overlay-title">{entry.title}</span>
+        <button className="sim-close" onClick={onClose}>✕ Close</button>
+      </div>
+      <iframe className="sim-frame" src={src} title={entry.title} sandbox="allow-scripts" />
+    </div>
+  );
+}
+
 // Flashcard View Component
-function FlashcardView({ topic, cardIndex, isFlipped, onFlip, onCorrect, onIncorrect, timeRemaining, studentName, onExit }) {
+function FlashcardView({ topic, cardIndex, isFlipped, onFlip, onCorrect, onIncorrect, timeRemaining, studentName, onExit, onSimPause }) {
   const card = topic.cards[cardIndex];
   const progress = ((cardIndex + 1) / topic.cards.length) * 100;
+
+  const [simEntries, setSimEntries] = useState([]);
+  const [openSim, setOpenSim] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`${SIM_BASE}index.json`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!cancelled && data && Array.isArray(data.entries)) setSimEntries(data.entries);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Never leave the session timer paused if this view goes away
+  useEffect(() => () => { if (onSimPause) onSimPause(false); }, [onSimPause]);
+
+  const simMatch = findSimulation(simEntries, card.keyword);
+  const openSimulation = () => {
+    setOpenSim(simMatch);
+    if (onSimPause) onSimPause(true);
+  };
+  const closeSimulation = () => {
+    setOpenSim(null);
+    if (onSimPause) onSimPause(false);
+  };
   
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -518,12 +590,20 @@ function FlashcardView({ topic, cardIndex, isFlipped, onFlip, onCorrect, onIncor
         </div>
       </div>
 
+      {isFlipped && simMatch && (
+        <button className="explore-button" onClick={openSimulation}>
+          🔬 Explore: {simMatch.title}
+        </button>
+      )}
+
       {isFlipped && (
         <div className="response-buttons">
           <button className="btn-correct" onClick={onCorrect}>✓ Got it</button>
           <button className="btn-incorrect" onClick={onIncorrect}>✗ Need review</button>
         </div>
       )}
+
+      {openSim && <SimulationOverlay entry={openSim} onClose={closeSimulation} />}
     </div>
   );
 }
